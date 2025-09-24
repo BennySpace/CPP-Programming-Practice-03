@@ -103,15 +103,40 @@ void Game::startExpedition(Excavation* expedition) {
 }
 
 void Game::visitShop() {
-    std::cout << "Shop: \n1. Buy food (50 money for 5 units)" << std::endl;
+    std::cout << "Shop: \n1. Buy food (50 money for 5 units)\n2. Sell loot" << std::endl;
     std::cout << "Choose an action (0 to return): ";
     int choice;
     std::cin >> choice;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     if (choice == 1 && player.getMoney() >= 50) {
         player.spendMoney(50);
-        player.addFood(5);
+        player.addMoney(5);
         std::cout << "Purchased 5 units of food." << std::endl;
+    } else if (choice == 2) {
+        const auto& inventory = player.getInventory();
+
+        if (inventory.empty()) {
+            std::cout << "No items to sell." << std::endl;
+            return;
+        }
+
+        std::cout << "Loot items:" << std::endl;
+
+        for (size_t i = 0; i < inventory.size(); ++i) {
+            if (inventory[i].type == "loot") {
+                std::cout << i + 1 << ". " << inventory[i].name << " (value: " << inventory[i].value << ")" << ")" << std::endl;
+            }
+        }
+
+        std::cout << "Choose item to sell (0 to cancel): ";
+        int itemChoice;
+        std::cin >> itemChoice;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
+            player.sellItem(itemChoice - 1);
+        }
     } else if (choice != 0) {
         std::cout << "Not enough money or invalid choice." << std::endl;
     }
