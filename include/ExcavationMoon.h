@@ -7,7 +7,7 @@ class ExcavationMoon : public Excavation {
 public:
     ExcavationMoon();
 
-    void excavate() override;
+    void excavate(Player& player, const std::string& equipment) override;
     void effect() override;
     void printText() override;
 };

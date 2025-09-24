@@ -7,8 +7,8 @@ class ExcavationVulkano : public Excavation {
 public:
     ExcavationVulkano();
 
-    void excavate() override;
-    void effect() override;;
+    void excavate(Player& player, const std::string& equipment) override;
+    void effect() override;
     void printText();
 };
 

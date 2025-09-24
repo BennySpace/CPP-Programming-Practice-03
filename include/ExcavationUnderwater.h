@@ -7,7 +7,7 @@ class ExcavationUnderwater : public Excavation {
 public:
     ExcavationUnderwater();
 
-    void excavate() override;
+    void excavate(Player& player, const std::string& equipment) override;
     void effect() override;
     void printText() override;
 };
