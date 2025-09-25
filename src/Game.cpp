@@ -106,44 +106,88 @@ void Game::startExpedition(Excavation* expedition) {
 }
 
 void Game::visitShop() {
-    std::cout << "Shop: \n1. Buy food (50 money for 5 units)\n2. Sell loot" << std::endl;
-    std::cout << "Choose an action (0 to return): ";
+    std::cout << "\n=== Shop ===" << std::endl;
+    std::cout << "1. Buy food (50 money for 5 units)" << std::endl;
+    std::cout << "2. Buy Brush (10 money)" << std::endl;
+    std::cout << "3. Buy Shovel (20 money)" << std::endl;
+    std::cout << "4. Buy Pickaxe (30 money)" << std::endl;
+    std::cout << "5. Sell loot" << std::endl;
+    std::cout << "0. Exit" << std::endl;
+    std::cout << "Choose an action: " << std::endl;
     int choice;
     std::cin >> choice;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    if (choice == 1 && player.getMoney() >= 50) {
-        player.spendMoney(50);
-        player.addFood(5);
-        std::cout << "Purchased 5 units of food." << std::endl;
-        player.save(saveFile);
-    } else if (choice == 2) {
-        const auto& inventory = player.getInventory();
-
-        if (inventory.empty()) {
-            std::cout << "No items to sell." << std::endl;
-            return;
-        }
-
-        std::cout << "Loot items:" << std::endl;
-
-        for (size_t i = 0; i < inventory.size(); ++i) {
-            if (inventory[i].type == "loot") {
-                std::cout << i + 1 << ". " << inventory[i].name << " (value: " << inventory[i].value << ")" << ")" << std::endl;
+    switch (choice) {
+        case 1: {
+            if (player.getMoney() >= 50) {
+                player.spendMoney(50);
+                player.addFood(5);
+                std::cout << "Purchased 5 units of of food" << std::endl;
+                player.save(saveFile);
+            } else {
+                std::cout << "Not enough money." << std::endl;
             }
-        }
 
-        std::cout << "Choose item to sell (0 to cancel): ";
-        int itemChoice;
-        std::cin >> itemChoice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-        if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
-            player.sellItem(itemChoice - 1);
-            player.save(saveFile);
+            break;
         }
-    } else if (choice != 0) {
-        std::cout << "Not enough money or invalid choice." << std::endl;
+        case 2: {
+            player.buyEquipment("Brush", 10);
+
+            if (player.getMoney() >= 10) {
+                player.save(saveFile);
+            }
+
+            break;
+        }
+        case 3: {
+            player.buyEquipment("Shovel", 20);
+
+            if (player.getMoney() >= 20) {
+                player.save(saveFile);
+            }
+
+            break;
+        }
+        case 4: {
+            player.buyEquipment("Pickaxe", 30);
+
+            if (player.getMoney() >= 30) {
+                player.save(saveFile);
+            }
+
+            break;
+        }
+        case 5: {
+            const auto& inventory = player.getInventory();
+
+            if (inventory.empty()) {
+                std::cout << "No items to sell.";
+                break;
+            }
+
+            std::cout << "Look items: " << std::endl;
+            for (size_t i = 0; i < inventory.size(); ++i) {
+                if (inventory[i].type == "loot") {
+                    std::cout << i + 1 << ". " << inventory[i].name
+                              << " (value: " << inventory[i].value << ")" << std::endl;
+                }
+            }
+
+            std::cout << "Choose item to sell (0 to cancel): ";
+            int itemChoice;
+            std::cin >> itemChoice;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+            if (itemChoice > 0 && itemChoice < inventory.size()) {
+                player.sellItem(itemChoice - 1);
+                player.save(saveFile);
+            }
+
+            break;
+        }
+        case 0: break;
+        default: std::cout << "Invalid choice." << std::endl;
     }
 }
 
