@@ -94,18 +94,26 @@ bool Player::save(const std::string &filename) const {
         });
     }
 
-    std::ofstream file(filename);
+    j["museum"] = json::array();
+    for (const auto& exhibit : museumCollection) {
+        j["museum"].push_back({
+            {"name", exhibit.name},
+            {"type", exhibit.type},
+            {"value", exhibit.value},
+            {"description", exhibit.description}
+        });
+    }
 
+    std::ofstream file(filename);
     if (!file.is_open()) {
         std::cout << "ERROR: Could not open file " << filename << " for saving." << std::endl;
-
         return false;
     }
 
     file << j.dump(4);
     file.close();
-    std::cout << "Game saved successfully.";
 
+    std::cout << "Game saved successfully.";
     return true;
 }
 
@@ -114,7 +122,6 @@ bool Player::load(const std::string &filename) {
 
     if (!file.is_open()) {
         std::cout << "No save file found, starting new game." << std::endl;
-
         return false;
     }
 
@@ -134,6 +141,16 @@ bool Player::load(const std::string &filename) {
                 item.value("value", 0)
             ));
         }
+
+        museumCollection.clear();
+        for (const auto& exhibit : j.value("museum", json::array())) {
+            museumCollection.push_back(Item(
+                exhibit.value("name", ""),
+                exhibit.value("type", ""),
+                exhibit.value("value", 0),
+                exhibit.value("description", "")
+            ));
+        }
     } catch (const json::exception& e) {
         std::cout << "Error loading save file: " << e.what() << std::endl;
         file.close();
@@ -141,6 +158,51 @@ bool Player::load(const std::string &filename) {
     }
 
     std::cout << "Game loaded successfully." << std::endl;
-
     return true;
+}
+
+void Player::donateToMuseum(size_t index) {
+    if (index >= inventory.size() || inventory[index].type != "loot") {
+        std::cout << "Invalid item or not a loot item." << std::endl;
+        return;
+    }
+
+    for (const auto& exhibit : museumCollection) {
+        if (exhibit.name == inventory[index].name) {
+            std::cout << "This item is already in the museum!" << std::endl;
+            return;
+        }
+    }
+
+    Item exhibit = inventory[index];
+    if (exhibit.name == "Ammonite") {
+        exhibit.description = "A spiral shell from an ancient marine creature.";
+    } else if (exhibit.name == "Marine Fossil") {
+        exhibit.description = "A fossilized remnant of sea creature.";
+    } else if (exhibit.name == "Dinosaur Bone") {
+        exhibit.description = "A well-preserved dinosaur bone from a volcanic expedition.";
+    } else if (exhibit.name == "Fossil Fragment") {
+        exhibit.description = "A small piece of a larger fossil.";
+    } else if (exhibit.name == "Cosmic Fossil") {
+        exhibit.description = "A rare fossil";
+    } else if (exhibit.name == "Lunar Rock") {
+        exhibit.description = "A rock sample from the moon.";
+    }
+
+    museumCollection.push_back(exhibit);
+    std::cout << "Donated " << exhibit.name << " to the museum!" << std::endl;
+    inventory.erase(inventory.begin() + index);
+}
+
+void Player::showMuseum() const {
+    if (museumCollection.empty()) {
+        std::cout << "The museum is empty. Donate some loot to display!";
+        return;
+    }
+
+    std::cout << "\n=== Museum Collection ===" << std::endl;
+    for (const auto& exhibit : museumCollection) {
+        std::cout << "- " << exhibit.name << " (" << exhibit.type << ", value: " << exhibit.value << ")" << std::endl;
+        std::cout << " Description: " << exhibit.description << std::endl;
+    }
 }
