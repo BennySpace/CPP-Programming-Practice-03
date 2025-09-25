@@ -25,6 +25,8 @@ public:
     void sellItem(size_t index);
     bool isGameOver() const;
     void showStatus() const;
+    bool save(const std::string& filename) const;
+    bool load(const std::string& filename);
 };
 
 #endif // PLAYER_H
