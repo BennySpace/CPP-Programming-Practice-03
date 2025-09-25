@@ -6,6 +6,7 @@
 #include <limits>
 
 Game::Game() {
+    player.load(saveFile);
     expeditions.push_back(new ExcavationUnderwater());
     expeditions.push_back(new ExcavationVulkano());
     expeditions.push_back(new ExcavationMoon());
@@ -65,6 +66,7 @@ void Game::chooseExpedition() {
 
     if (choice >= 1 && choice <= static_cast<int>(expeditions.size())) {
         startExpedition(expeditions[choice - 1]);
+        player.save(saveFile);
     }
 }
 
@@ -94,6 +96,7 @@ void Game::startExpedition(Excavation* expedition) {
 
             expedition->excavate(player, equipment);
             player.showStatus();
+            player.save(saveFile);
         }
 
         std::cout << "Out of food! Returning to base." << std::endl;
@@ -111,8 +114,9 @@ void Game::visitShop() {
 
     if (choice == 1 && player.getMoney() >= 50) {
         player.spendMoney(50);
-        player.addMoney(5);
+        player.addFood(5);
         std::cout << "Purchased 5 units of food." << std::endl;
+        player.save(saveFile);
     } else if (choice == 2) {
         const auto& inventory = player.getInventory();
 
@@ -136,6 +140,7 @@ void Game::visitShop() {
 
         if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
             player.sellItem(itemChoice - 1);
+            player.save(saveFile);
         }
     } else if (choice != 0) {
         std::cout << "Not enough money or invalid choice." << std::endl;

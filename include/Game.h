@@ -6,12 +6,14 @@
 #include <vector>
 
 class Game {
+private:
+    Player player;
+    std::vector<Excavation*> expeditions;
+    const std::string saveFile = "savegame.json";
+
 public:
     Game();
     ~Game();
-
-    Player player;
-    std::vector<Excavation*> expeditions;
 
     void run();
 
