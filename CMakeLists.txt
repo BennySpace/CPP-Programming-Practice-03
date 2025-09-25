@@ -6,12 +6,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-file(GLOB HEADERS "${CMAKE_SOURCE_DIR}/include/*.h")
+file(GLOB HEADERS
+        "${CMAKE_SOURCE_DIR}/include/*.h"
+        "${CMAKE_SOURCE_DIR}/include/nlohmann/json.hpp")
 file(GLOB SOURCES
         "${CMAKE_SOURCE_DIR}/main.cpp"
-        "${CMAKE_SOURCE_DIR}/src/*.cpp"
-
-)
+        "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
 add_executable(PaleontologistSimulator ${HEADERS} ${SOURCES}
         src/Game.cpp)
