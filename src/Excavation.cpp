@@ -1,7 +1,7 @@
 #include "Excavation.h"
 
-Excavation::Excavation(const std::string &n, const std::string &t, int c)
-    : name(n), terrainType(t), cost(c) {}
+Excavation::Excavation(const std::string &name, const std::string &terrain, int cost)
+    : name(name), terrainType(terrain), cost(cost) {}
 
 std::string Excavation::getName() const {
     return name;
