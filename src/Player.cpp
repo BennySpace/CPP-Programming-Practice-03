@@ -206,3 +206,20 @@ void Player::showMuseum() const {
         std::cout << " Description: " << exhibit.description << std::endl;
     }
 }
+
+bool Player::buyEquipment(const std::string &equipmentName, int cost) {
+    if (hasEquipment(equipmentName)) {
+        std::cout << "You already have a " << equipmentName << " !" << std::endl;
+        return false;
+    }
+
+    if (getMoney() < cost) {
+        std::cout << "Not enough money to buy " << equipmentName << "!" << std::endl;
+        return false;
+    }
+
+    spendMoney(cost);
+    addItem(Item(equipmentName, "equipment", cost));
+    std::cout << "Purchased " << equipmentName << " for " << cost << " money." << std::endl;
+    return true;
+}
