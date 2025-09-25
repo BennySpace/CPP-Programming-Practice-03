@@ -4,6 +4,8 @@
 
 ExcavationVulkano::ExcavationVulkano()
     : Excavation("Volcanic expedition", "Volcano", 150) {
+    std::random_device rd;
+    rng.seed(rd());
 }
 
 void ExcavationVulkano::excavate(Player& player, const std::string& equipment) {
@@ -14,7 +16,8 @@ void ExcavationVulkano::excavate(Player& player, const std::string& equipment) {
 
     player.spendFood();
     std::cout << "Excavating on volcano with " << equipment << "..." << std::endl;
-    int chance = std::rand() % 100;
+    std::uniform_int_distribution<int> dist(1, 100);
+    int chance = dist(rng);
 
     if (equipment == "Shovel" && chance < 80) {
         player.addItem(Item("Dinosaur Bone", "loot", 100));
@@ -29,10 +32,10 @@ void ExcavationVulkano::excavate(Player& player, const std::string& equipment) {
     }
 }
 
-void ExcavationVulkano::effect() {
+void ExcavationVulkano::effect() const {
     std::cout << "Effect: chance to find rare bones, but a pickaxe may damage loot.\n";
 }
 
-void ExcavationVulkano::printText() {
+void ExcavationVulkano::printText() const {
     std::cout << "The heat is unbearable, but you dig through volcanic ash!\n";
 }

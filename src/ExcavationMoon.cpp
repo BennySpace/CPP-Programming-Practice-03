@@ -4,7 +4,10 @@
 #include "ExcavationVulkano.h"
 
 ExcavationMoon::ExcavationMoon()
-    : Excavation("Lunar expedition", "Moon", 200) {}
+    : Excavation("Lunar expedition", "Moon", 200) {
+    std::random_device rd;
+    rng.seed(rd());
+}
 
 void ExcavationMoon::excavate(Player& player, const std::string& equipment) {
     if (!player.hasEquipment(equipment)) {
@@ -14,7 +17,8 @@ void ExcavationMoon::excavate(Player& player, const std::string& equipment) {
 
     player.spendFood();
     std::cout << "Excavating on the Moon with " << equipment << "..." << std::endl;
-    int chance = std::rand() % 100;
+    std::uniform_int_distribution<int> dist(1, 100);
+    int chance = dist(rng);
 
     if (equipment == "Pickaxe" && chance < 60) {
         player.addItem(Item("Cosmic Fossil", "loot", 150));
@@ -29,10 +33,10 @@ void ExcavationMoon::excavate(Player& player, const std::string& equipment) {
     }
 }
 
-void ExcavationMoon::effect() {
+void ExcavationMoon::effect() const {
     std::cout << "Effect: unique loot, but special equipment is required.\n";
 }
 
-void ExcavationMoon::printText() {
+void ExcavationMoon::printText() const {
     std::cout << "Low gravity, but digging is still tough!\n";
 }

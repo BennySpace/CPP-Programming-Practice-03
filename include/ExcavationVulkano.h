@@ -8,8 +8,8 @@ public:
     ExcavationVulkano();
 
     void excavate(Player& player, const std::string& equipment) override;
-    void effect() override;
-    void printText();
+    void effect() const override;
+    void printText() const override;
 };
 
 #endif // EXCAVATIONVULKANO_H

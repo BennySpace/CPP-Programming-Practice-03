@@ -8,8 +8,8 @@ public:
     ExcavationMoon();
 
     void excavate(Player& player, const std::string& equipment) override;
-    void effect() override;
-    void printText() override;
+    void effect() const override;
+    void printText() const override;
 };
 
 #endif // EXCAVATIONMOON_H
