@@ -30,6 +30,7 @@ public:
     bool load(const std::string& filename);
     void donateToMuseum(size_t index);
     void showMuseum() const;
+    bool buyEquipment(const std::string& equipmentName, int cost);
 };
 
 #endif // PLAYER_H
