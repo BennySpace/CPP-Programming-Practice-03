@@ -148,5 +148,46 @@ void Game::visitShop() {
 }
 
 void Game::visitMuseum() {
-    std::cout << "Museum: it's empty for now, but soon you'll see your loot here!" << std::endl;
+    std::cout << "\n=== Museum ===" << std::endl;
+    std::cout << "1. View collection\n2. Donate loot\n3. Return to base" << std::endl;
+    std::cout << "Choose an action: ";
+    int choice;
+    std::cin >> choice;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    switch (choice) {
+        case 1: {
+            player.showMuseum();
+            break;
+        }
+        case 2: {
+            const auto& inventory = player.getInventory();
+            if (inventory.empty()) {
+                std::cout << "No items to donate." << std::endl;
+                break;
+            }
+
+            std::cout << "Loot items available for doantion:" << std::endl;
+            for (size_t i = 0; i < inventory.size(); ++i) {
+                if (inventory[i].type == "loot") {
+                    std::cout << i + 1 << ". " << inventory[i].name << " (value: " << inventory[i].value
+                                       << ")" << std::endl;
+                }
+            }
+
+            std::cout << "Choose item to donate (0 to cancel): ";
+            int itemChoice;
+            std::cin >> itemChoice;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+            if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
+                player.donateToMuseum(itemChoice - 1);
+                player.save(saveFile);
+            }
+
+            break;
+        }
+        case 3: break;
+        default: std::cout << "Invalid choice, try again." << std::endl;
+    }
 }
