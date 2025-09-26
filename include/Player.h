@@ -31,6 +31,7 @@ public:
     void donateToMuseum(size_t index);
     void showMuseum() const;
     bool buyEquipment(const std::string& equipmentName, int cost);
+    bool repairEquipment(size_t index, int cost);
 };
 
 #endif // PLAYER_H

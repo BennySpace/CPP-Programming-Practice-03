@@ -6,9 +6,9 @@
 using json = nlohmann::json;
 
 Player::Player() : money(500), food(10) {
-    inventory.push_back(Item("Brush", "equipment", 10));
-    inventory.push_back(Item("Shovel", "equipment", 20));
-    inventory.push_back(Item("Pickaxe", "equipment", 30));
+    inventory.push_back(Item("Brush", "equipment", 10, "", 100, false));
+    inventory.push_back(Item("Shovel", "equipment", 20, "", 100, false));
+    inventory.push_back(Item("Pickaxe", "equipment", 30, "", 100, false));
 }
 
 int Player::getMoney() const {
@@ -72,12 +72,20 @@ bool Player::isGameOver() const {
 void Player::showStatus() const {
     std::cout << "Money: " << money << " | Food: " << food << std::endl;
     std::cout << "Inventory:";
-
     for (const auto& item : inventory) {
-        std::cout << item.name << " (" << item.type << "), ";
-    }
+        std::cout << item.name << " (" << item.type;
+        if (item.type == "equipment") {
+            std::cout << ", durability: " << item.durability;
 
-    std::cout << std::endl;
+            if (item.isBroken) {
+                std::cout << ", BROKEN";
+            }
+
+            std::cout << "), ";
+        }
+
+        std::cout << std::endl;
+    }
 }
 
 bool Player::save(const std::string &filename) const {
@@ -87,11 +95,18 @@ bool Player::save(const std::string &filename) const {
     j["inventory"] = json::array();
 
     for (const auto& item : inventory) {
-        j["inventory"].push_back({
+        json itemJson = {
             {"name", item.name},
             {"type", item.type},
             {"value", item.value}
-        });
+        };
+
+        if (item.type == "equipment") {
+            itemJson["durability"] = item.durability;
+            itemJson["isBroken"] = item.isBroken;
+        }
+
+        j["inventory"].push_back(itemJson);
     }
 
     j["museum"] = json::array();
@@ -135,11 +150,18 @@ bool Player::load(const std::string &filename) {
         inventory.clear();
 
         for (const auto& item : j["inventory"]) {
-            inventory.push_back(Item(
+            Item newItem(
                 item.value("name", ""),
                 item.value("type", ""),
                 item.value("value", 0)
-            ));
+            );
+
+            if (item.value("type", "") == "equipment") {
+                newItem.durability = item.value("durability", 100);
+                newItem.isBroken = item.value("isBroken", false);
+            }
+
+            inventory.push_back(newItem);
         }
 
         museumCollection.clear();
@@ -221,5 +243,29 @@ bool Player::buyEquipment(const std::string &equipmentName, int cost) {
     spendMoney(cost);
     addItem(Item(equipmentName, "equipment", cost));
     std::cout << "Purchased " << equipmentName << " for " << cost << " money." << std::endl;
+    return true;
+}
+
+bool Player::repairEquipment(size_t index, int cost) {
+    if (index >= inventory.size() || inventory[index].type != "equipment") {
+        std::cout << "Invalid item or not equipment." << std::endl;
+        return false;
+    }
+
+    if (!inventory[index].isBroken) {
+        std::cout << inventory[index].name << " is broken." << std::endl;
+        return false;
+    }
+
+    if (getMoney() < cost) {
+        std::cout << "Not enough money to repair " << inventory[index].name << "!" << std::endl;
+        return false;
+    }
+
+    spendMoney(cost);
+    inventory[index].isBroken = false;
+    inventory[index].durability = 100;
+    std::cout << "Repaired " << inventory[index].name << " for " << cost << " money." << std::endl;
+
     return true;
 }
