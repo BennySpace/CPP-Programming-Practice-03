@@ -119,6 +119,7 @@ void Game::visitShop() {
     std::cout << "3. Buy Shovel (20 money)" << std::endl;
     std::cout << "4. Buy Pickaxe (30 money)" << std::endl;
     std::cout << "5. Sell loot" << std::endl;
+    std::cout << "6. Repair equipment" << std::endl;
     std::cout << "0. Exit" << std::endl;
     std::cout << "Choose an action: " << std::endl;
     int choice;
@@ -138,6 +139,7 @@ void Game::visitShop() {
 
             break;
         }
+
         case 2: {
             player.buyEquipment("Brush", 10);
             if (player.getMoney() >= 10) {
@@ -145,6 +147,7 @@ void Game::visitShop() {
             }
             break;
         }
+
         case 3: {
             player.buyEquipment("Shovel", 20);
             if (player.getMoney() >= 20) {
@@ -152,6 +155,7 @@ void Game::visitShop() {
             }
             break;
         }
+
         case 4: {
             player.buyEquipment("Pickaxe", 30);
             if (player.getMoney() >= 30) {
@@ -159,6 +163,7 @@ void Game::visitShop() {
             }
             break;
         }
+
         case 5: {
             const auto& inventory = player.getInventory();
 
@@ -187,8 +192,50 @@ void Game::visitShop() {
 
             break;
         }
-        case 0: break;
-        default: std::cout << "Invalid choice." << std::endl;
+
+        case 6: {
+            const auto& inventory = player.getInventory();
+            bool hasBroken = false;
+
+            for (const auto& item : inventory) {
+                if (item.type == "equipment" && item.isBroken) {
+                    hasBroken = true;
+                    break;
+                }
+            }
+
+            if (!hasBroken) {
+                std::cout << "No broken equipment to repair." << std::endl;
+                break;
+            }
+
+            std::cout << "Broken equipment: " << std::endl;
+            for (size_t i = 0; i < inventory.size(); ++i) {
+                if (inventory[i].type == "equipment" && inventory[i].isBroken) {
+                    std::cout << i + 1 << ". " << inventory[i].name << " (repair cost: " << inventory[i].value / 2 << ")" << std::endl;
+                }
+            }
+
+            std::cout << "Choose equipment to repair (0 to cancel): ";
+            int itemChoice;
+            std::cin >> itemChoice;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+            if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
+                player.repairEquipment(itemChoice - 1, inventory[itemChoice - 1].value / 2);
+                player.save(saveFile);
+            }
+
+            break;
+        }
+
+        case 0: {
+            break;
+        }
+
+        default: {
+            std::cout << "Invalid choice." << std::endl;
+        }
     }
 }
 
