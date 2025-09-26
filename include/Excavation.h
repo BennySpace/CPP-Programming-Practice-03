@@ -17,7 +17,7 @@ public:
     virtual ~Excavation() = default;
 
     virtual void excavate(Player& player, const std::string& equipment) = 0;
-    virtual void effect() const = 0;
+    virtual void effect(Player& player) = 0;
     virtual void printText() const = 0;
 
     std::string getName() const;

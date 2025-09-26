@@ -8,7 +8,7 @@ public:
     ExcavationUnderwater();
 
     void excavate(Player& player, const std::string& equipment) override;
-    void effect() const override;
+    void effect(Player& player) override;
     void printText() const override;
 };
 
