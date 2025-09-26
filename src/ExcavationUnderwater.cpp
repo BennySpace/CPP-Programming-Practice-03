@@ -30,8 +30,15 @@ void ExcavationUnderwater::excavate(Player& player, const std::string& equipment
     }
 }
 
-void ExcavationUnderwater::effect() const {
-    std::cout << "Effect: high chance of finding ammonites, but a brush is required.\n";
+void ExcavationUnderwater::effect(Player& player) {
+    std::cout << "The underwater makes excavation challenging." << std::endl;
+    std::uniform_int_distribution<int> dist(1, 100);
+    int chance = dist(rng);
+
+    if (chance <= 20) {
+        player.spendMoney(10);
+        std::cout << "Water damaged your equipment! You spent 10 money on repairs." << std::endl;
+    }
 }
 
 void ExcavationUnderwater::printText() const {

@@ -33,8 +33,23 @@ void ExcavationMoon::excavate(Player& player, const std::string& equipment) {
     }
 }
 
-void ExcavationMoon::effect() const {
-    std::cout << "Effect: unique loot, but special equipment is required.\n";
+void ExcavationMoon::effect(Player& player) {
+    std::cout << "The low gravity maked excavation tricky!" << std::endl;
+    std::uniform_int_distribution<int> dist(1, 100);
+    int chance = dist(rng);
+
+    if (chance <= 10) {
+        const auto& inventory = player.getInventory();
+
+        if (!inventory.empty()) {
+            std::uniform_int_distribution<size_t> itemDist(0, inventory.size() - 1);
+            size_t index = itemDist(rng);
+            std::string itemName = inventory[index].name;
+            player.sellItem(index);
+            player.spendMoney(-inventory[index].value);
+            std::cout << "Low gravity caused you to lose your " << itemName << "!" << std::endl;
+        }
+    }
 }
 
 void ExcavationMoon::printText() const {

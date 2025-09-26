@@ -32,8 +32,15 @@ void ExcavationVulkano::excavate(Player& player, const std::string& equipment) {
     }
 }
 
-void ExcavationVulkano::effect() const {
-    std::cout << "Effect: chance to find rare bones, but a pickaxe may damage loot.\n";
+void ExcavationVulkano::effect(Player& player) {
+    std::cout << "The heat is intense!" << std::endl;
+    std::uniform_int_distribution<int> dist(1, 100);
+    int chance = dist(rng);
+
+    if (chance <= 25) {
+        player.spendFood();
+        std::cout << "The heat exhausted you! You consumed 1 extra food." << std::endl;
+    }
 }
 
 void ExcavationVulkano::printText() const {
