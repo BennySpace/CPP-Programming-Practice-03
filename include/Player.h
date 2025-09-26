@@ -11,6 +11,7 @@ private:
     int food;
     std::vector<Item> inventory;
     std::vector<Item> museumCollection;
+    std::vector<int> museumRewards;
 
 public:
     Player();

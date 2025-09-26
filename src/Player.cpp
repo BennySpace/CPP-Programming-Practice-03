@@ -214,6 +214,22 @@ void Player::donateToMuseum(size_t index) {
     museumCollection.push_back(exhibit);
     std::cout << "Donated " << exhibit.name << " to the museum!" << std::endl;
     inventory.erase(inventory.begin() + index);
+
+    size_t exhibitCount = museumCollection.size();
+    if (exhibitCount >= 9 && std::find(museumRewards.begin(), museumRewards.end(), 9) == museumRewards.end()) {
+        addMoney(300);
+        museumRewards.push_back(9);
+        std::cout << "Congratulations! You collected 9 exhibits and earned a 300 money reward!" << std::endl;
+    } else if (exhibitCount >= 6 && std::find(museumRewards.begin(), museumRewards.end(), 6) == museumRewards.end()) {
+        addMoney(200);
+        museumRewards.push_back(6);
+        std::cout << "Congratulations! You collected 6 exhibits and earned a 200 money reward!" << std::endl;
+    } else if (exhibitCount >= 3 && std::find(museumRewards.begin(), museumRewards.end(), 3) == museumRewards.end()) {
+        addMoney(100);
+        museumRewards.push_back(3);
+        std::cout << "Congratulations! You collected 3 exhibits and earned a 100 money reward!" << std::endl;
+    }
+
 }
 
 void Player::showMuseum() const {
