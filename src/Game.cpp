@@ -45,7 +45,7 @@ void Game::handleMainMenu(int choice) {
         case 1: chooseExpedition(); break;
         case 2: visitShop(); break;
         case 3: visitMuseum(); break;
-        case 4: exit(0);
+        case 4: player.save(saveFile); exit(0);
         default: std::cout << "Invalid choice, try again." << std::endl;
     }
 }
@@ -71,38 +71,45 @@ void Game::chooseExpedition() {
 }
 
 void Game::startExpedition(Excavation* expedition) {
-    if (player.getMoney() >= expedition->getCost()) {
-        player.spendMoney(expedition->getCost());
-        std::cout << "You embarked on " << expedition->getName() << "!" << std::endl;
-        expedition->printText();
-        expedition->effect();
+    if (player.getMoney() < expedition->getCost()) {
+        std::cout << "Not enough money for the expedition!" << std::endl;
+        return;
+    }
 
-        while (player.getFood() > 0) {
-            std::cout << "\nChoose equipment for excavation:" << std::endl;
-            std::cout << "1. Brush\n2. Shovel\n3. Pickaxe\n4. Return to base" << std::endl;
-            std::cout << "Choice: ";
-            int choice;
-            std::cin >> choice;
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::string equipment;
+    if (player.getFood() <= 0) {
+        std::cout << "Not enough food for the expedition! Visit the shop to buy food." << std::endl;
+        return;
+    }
 
-            switch (choice) {
-                case 1: equipment = "Brush"; break;
-                case 2: equipment = "Shovel"; break;
-                case 3: equipment = "Pickaxe"; break;
-                case 4: return;
-                default: std::cout << "Invalid choice, try again." << std::endl; continue;
-            }
+    player.spendMoney(expedition->getCost());
+    std::cout << "You embarked on " << expedition->getName() << "!" << std::endl;
+    expedition->printText();
+    expedition->effect(player);
+    player.save(saveFile);
 
-            expedition->excavate(player, equipment);
-            player.showStatus();
-            player.save(saveFile);
+    while (player.getFood() > 0) {
+        std::cout << "\nChoose equipment for excavation:" << std::endl;
+        std::cout << "1. Brush\n2. Shovel\n3. Pickaxe\n4. Return to base" << std::endl;
+        std::cout << "Choice: ";
+        int choice;
+        std::cin >> choice;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::string equipment;
+
+        switch (choice) {
+            case 1: equipment = "Brush"; break;
+            case 2: equipment = "Shovel"; break;
+            case 3: equipment = "Pickaxe"; break;
+            case 4: return;
+            default: std::cout << "Invalid choice, try again." << std::endl; continue;
         }
 
-        std::cout << "Out of food! Returning to base." << std::endl;
-    } else {
-        std::cout << "Not enough money for the expedition!" << std::endl;
+        expedition->excavate(player, equipment);
+        player.showStatus();
+        player.save(saveFile);
     }
+
+    std::cout << "Out of food! Returning to base." << std::endl;
 }
 
 void Game::visitShop() {
@@ -133,29 +140,23 @@ void Game::visitShop() {
         }
         case 2: {
             player.buyEquipment("Brush", 10);
-
             if (player.getMoney() >= 10) {
                 player.save(saveFile);
             }
-
             break;
         }
         case 3: {
             player.buyEquipment("Shovel", 20);
-
             if (player.getMoney() >= 20) {
                 player.save(saveFile);
             }
-
             break;
         }
         case 4: {
             player.buyEquipment("Pickaxe", 30);
-
             if (player.getMoney() >= 30) {
                 player.save(saveFile);
             }
-
             break;
         }
         case 5: {
@@ -211,7 +212,7 @@ void Game::visitMuseum() {
                 break;
             }
 
-            std::cout << "Loot items available for doantion:" << std::endl;
+            std::cout << "Loot items available for donation:" << std::endl;
             for (size_t i = 0; i < inventory.size(); ++i) {
                 if (inventory[i].type == "loot") {
                     std::cout << i + 1 << ". " << inventory[i].name << " (value: " << inventory[i].value
