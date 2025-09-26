@@ -16,6 +16,25 @@ void ExcavationMoon::excavate(Player& player, const std::string& equipment) {
     }
 
     player.spendFood();
+
+    for (auto& item : player.getInventory()) {
+        if (item.type == "equipment" && item.name == equipment && !item.isBroken) {
+            std::uniform_int_distribution<int> dist(1, 100);
+
+            if (dist(rng) <= 10) {
+                item.durability = std::max(0, item.durability - 10);
+                std::cout << equipment << " took wear! Durability now: " << item.durability << std::endl;
+
+                if (item.durability <= 0) {
+                    item.isBroken = true;
+                    std::cout << equipment << " is broken and needs repair!" << std::endl;
+                }
+            }
+
+            break;
+        }
+    }
+
     std::cout << "Excavating on the Moon with " << equipment << "..." << std::endl;
     std::uniform_int_distribution<int> dist(1, 100);
     int chance = dist(rng);

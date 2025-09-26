@@ -8,11 +8,30 @@ ExcavationUnderwater::ExcavationUnderwater() : Excavation("Underwater expedition
 
 void ExcavationUnderwater::excavate(Player& player, const std::string& equipment) {
     if (!player.hasEquipment(equipment)) {
-        std::cout << "You don't have a " << equipment << "!" << std::endl;
+        std::cout << "You don't have a working " << equipment << "!" << std::endl;
         return;
     }
 
     player.spendFood();
+
+    for (auto& item : player.getInventory()) {
+        if (item.type == "equipment" && item.name == equipment && !item.isBroken) {
+            std::uniform_int_distribution<int> dist(1, 100);
+
+            if (dist(rng) <= 20) {
+                item.durability = std::max(0, item.durability - 10);
+                std::cout << equipment << " took wear! Durability now: " << item.durability << std::endl;
+
+                if (item.durability <= 0) {
+                    item.isBroken = true;
+                    std::cout << equipment << " is broken and needs repair!" << std::endl;
+                }
+            }
+
+            break;
+        }
+    }
+
     std::cout << "Excavating underwater with " << equipment << "..." << std::endl;
     std::uniform_int_distribution<int> dist(1, 100);
     int chance = dist(rng);
