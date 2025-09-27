@@ -35,7 +35,8 @@ void Game::showMainMenu() {
     std::cout << "1. Go on an expedition" << std::endl;
     std::cout << "2. Visit the shop" << std::endl;
     std::cout << "3. Visit the museum" << std::endl;
-    std::cout << "4. Exit game" << std::endl;
+    std::cout << "4. Start new game" << std::endl;
+    std::cout << "0. Exit game" << std::endl;
     player.showStatus();
     std::cout << "Choose an action: ";
 }
@@ -45,7 +46,13 @@ void Game::handleMainMenu(int choice) {
         case 1: chooseExpedition(); break;
         case 2: visitShop(); break;
         case 3: visitMuseum(); break;
-        case 4: player.save(saveFile); exit(0);
+        case 4: {
+            player.reset();
+            player.save(saveFile);
+            std::cout << "New game started. Current progress saved." << std::endl;
+            break;
+        }
+        case 0: player.save(saveFile); exit(0);
         default: std::cout << "Invalid choice, try again." << std::endl;
     }
 }

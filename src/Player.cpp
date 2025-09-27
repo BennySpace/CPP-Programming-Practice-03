@@ -285,3 +285,15 @@ bool Player::repairEquipment(size_t index, int cost) {
 
     return true;
 }
+
+void Player::reset() {
+    money = 500;
+    food = 10;
+    inventory.clear();
+    museumCollection.clear();
+    museumRewards.clear();
+    inventory.push_back(Item("Brush", "equipment", 10, "", 100, false));
+    inventory.push_back(Item("Shovel", "equipment", 20, "", 100, false));
+    inventory.push_back(Item("Pickaxe", "equipment", 30, "", 100, false));
+    std::cout << "Started a new game!" << std::endl;
+}
