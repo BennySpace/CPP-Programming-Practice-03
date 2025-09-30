@@ -2,6 +2,7 @@
 #define ITEM_H
 
 #include <string>
+#include <utility>
 
 struct item {
     std::string mName;
@@ -11,8 +12,8 @@ struct item {
     mutable int mDurability;
     mutable bool mIsBroken;
 
-    item(const std::string& pName, const std::string& pType, int pValue, const std::string& pDescription = "", int pDurability = 0, bool pIsBroken = false)
-        : mName(pName), mType(pType), mValue(pValue), mDescription(pDescription), mDurability(pDurability), mIsBroken(pIsBroken) {}
+    item(std::string pName, std::string  pType, const int pValue, std::string  pDescription = "", const int pDurability = 0, const bool pIsBroken = false)
+        : mName(std::move(pName)), mType(std::move(pType)), mValue(pValue), mDescription(std::move(pDescription)), mDurability(pDurability), mIsBroken(pIsBroken) {}
 };
 
 #endif // ITEM_H
