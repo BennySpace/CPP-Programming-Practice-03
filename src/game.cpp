@@ -31,10 +31,16 @@ void game::run() {
 }
 
 void game::show_main_menu() {
-    std::cout << "\n=== Paddock Headquarters ===" << std::endl;
-    std::cout << "1. Start a race" << std::endl;
-    std::cout << "2. Visit the team shop" << std::endl;
-    std::cout << "3. Visit the F1 museum" << std::endl;
+    system("CLS");
+    std::cout << R"(
+ ______                    __ __  ____
+/_  __/__ ___ ___ _       / // / / __ \
+ / / / -_) _ `/  ' \     / _  / / /_/ /
+/_/  \__/\_,_/_/_/_/    /_//_/  \___\_\
+    )" << std::endl;
+    std::cout << "1. Enter a Grand-Prix" << std::endl;
+    std::cout << "2. Visit the Team Shop" << std::endl;
+    std::cout << "3. Visit the F1 Museum" << std::endl;
     std::cout << "0. Exit game" << std::endl;
     mPlayer.show_status();
     std::cout << "Choose an action: ";
@@ -51,12 +57,18 @@ void game::handle_main_menu(int pChoice) {
 }
 
 void game::choose_race() {
-    std::cout << "\n=== Choose Race ===" << std::endl;
+    system("CLS");
+    std::cout << R"(
+  _____                 __        ___      _
+ / ___/______ ____  ___/ / ____  / _ \____(_)_ __
+/ (_ / __/ _ `/ _ \/ _  / /___/ / ___/ __/ /\ \ /
+\___/_/  \_,_/_//_/\_,_/       /_/  /_/ /_//_\_\
+    )" << std::endl;
 
     for (size_t i = 0; i < mRaces.size(); ++i) {
         std::cout << i + 1 << ". " << mRaces[i]->get_name()
                   << " (" << mRaces[i]->get_circuit_type()
-                  << ", entry fee: " << mRaces[i]->get_cost() << ")" << std::endl;
+                  << ", entry fee: " << mRaces[i]->get_fee() << ")" << std::endl;
     }
 
     std::cout << "Choose a race (0 to return): ";
@@ -71,25 +83,28 @@ void game::choose_race() {
 }
 
 void game::start_race(race* pRace) {
-    if (mPlayer.get_money() < pRace->get_cost()) {
+    if (mPlayer.get_money() < pRace->get_fee()) {
         std::cout << "Not enough money for the race!" << std::endl;
         return;
     }
 
-    if (mPlayer.get_food() <= 0) {
+    if (mPlayer.get_fuel() <= 0) {
         std::cout << "Not enough fuel for the race! Visit the shop to buy fuel." << std::endl;
         return;
     }
 
-    mPlayer.spend_money(pRace->get_cost());
+    mPlayer.spend_money(pRace->get_fee());
     std::cout << "You embarked on " << pRace->get_name() << "!" << std::endl;
     pRace->print_text();
     pRace->effect(mPlayer);
     mPlayer.save(mSaveFile);
 
-    while (mPlayer.get_food() > 0) {
-        std::cout << "\nChoose mod for race:" << std::endl;
-        std::cout << "1. Aerodynamics\n2. Engine\n3. Tires\n0. Return to base" << std::endl;
+    while (mPlayer.get_fuel() > 0) {
+        std::cout << "\nChoose car modification for race:" << std::endl;
+        std::cout << "1. Apex-25 AW 'Aero Wing' (advanced wing profiles for better cornering grip)" << std::endl;
+        std::cout << "1. Apex-25 HP 'High Performance' (tuned for maximum power output)" << std::endl;
+        std::cout << "1. Apex-25 WG 'Wet Grip' (specialized tread for wet conditions)" << std::endl;
+        std::cout << "0. Return to HQ" << std::endl;
         std::cout << "Choice: ";
         int choice;
         std::cin >> choice;
@@ -97,10 +112,10 @@ void game::start_race(race* pRace) {
         std::string equipment;
 
         switch (choice) {
-            case 1: equipment = "Aerodynamics"; break;
-            case 2: equipment = "Engine"; break;
-            case 3: equipment = "Tires"; break;
-            case 4: return;
+            case 1: equipment = "AW"; break;
+            case 2: equipment = "HP"; break;
+            case 3: equipment = "WG"; break;
+            case 0: return;
             default: std::cout << "Invalid choice, try again." << std::endl; continue;
         }
 
@@ -109,18 +124,25 @@ void game::start_race(race* pRace) {
         mPlayer.save(mSaveFile);
     }
 
-    std::cout << "Out of fuel! Returning to base." << std::endl;
+    std::cout << "Out of fuel! Returning to HQ." << std::endl;
 }
 
 void game::visit_shop() {
-    std::cout << "\n=== Team Shop ===" << std::endl;
+    system("CLS");
+    std::cout << R"(
+ ______                   ______
+/_  __/__ ___ ___ _      / __/ /  ___  ___
+ / / / -_) _ `/  ' \    _\ \/ _ \/ _ \/ _ \
+/_/  \__/\_,_/_/_/_/   /___/_//_/\___/ .__/
+                                    /_/
+    )" << std::endl;
     std::cout << "1. Buy fuel (50 money for 5 units)" << std::endl;
     std::cout << "2. Buy Aerodynamics (10 money)" << std::endl;
     std::cout << "3. Buy Engine (20 money)" << std::endl;
     std::cout << "4. Buy Tires (30 money)" << std::endl;
     std::cout << "5. Sell loot" << std::endl;
     std::cout << "6. Repair mod" << std::endl;
-    std::cout << "0. Exit" << std::endl;
+    std::cout << "0. Return to HQ" << std::endl;
     std::cout << "Choose an action: " << std::endl;
     int choice;
     std::cin >> choice;
@@ -130,7 +152,7 @@ void game::visit_shop() {
         case 1: {
             if (mPlayer.get_money() >= 50) {
                 mPlayer.spend_money(50);
-                mPlayer.add_food(5);
+                mPlayer.add_fuel(5);
                 std::cout << "Purchased 5 units of of fuel" << std::endl;
                 mPlayer.save(mSaveFile);
             } else {
@@ -240,8 +262,16 @@ void game::visit_shop() {
 }
 
 void game::visit_museum() {
-    std::cout << "\n=== F1 Museum ===" << std::endl;
-    std::cout << "1. View collection\n2. Donate loot\n3. Return to base" << std::endl;
+    system("CLS");
+    std::cout << R"(
+   ____  ___    __  ___
+  / __/ <  /   /  |/  /_ _____ ___ __ ____ _
+ / _/   / /   / /|_/ / // (_-</ -_) // /  ' \
+/_/    /_/   /_/  /_/\_,_/___/\__/\_,_/_/_/_/
+    )" << std::endl;
+    std::cout << "1. View collection" << std::endl;
+    std::cout << "2. Donate loot" << std::endl;
+    std::cout << "0. Return to HQ" << std::endl;
     std::cout << "Choose an action: ";
     int choice;
     std::cin >> choice;
@@ -279,7 +309,7 @@ void game::visit_museum() {
 
             break;
         }
-        case 3: break;
+        case 0: break;
         default: std::cout << "Invalid choice, try again." << std::endl;
     }
 }
