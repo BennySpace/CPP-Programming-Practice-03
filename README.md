@@ -1,9 +1,6 @@
-# ITMO.GameDev / C++ Programming / Practice 03 - Paleontologist Simulator
+# ITMO.GameDev / C++ Programming / Practice 03 - F1 Simulator
 
 ## Project Description
-
-A console-based game where you play as a paleontologist, embarking on expeditions to find fossils and manage resources.
-
 ## Build Instructions
 ## Usage
 ## Dependencies
