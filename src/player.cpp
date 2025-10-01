@@ -5,7 +5,7 @@
 
 using json = nlohmann::json;
 
-player::player() : mMoney(500), mFood(10) {
+player::player() : mMoney(500), mFuel(10) {
     mInventory.push_back(item("Aerodynamics", "equipment", 10, "", 100, false));
     mInventory.push_back(item("Engine", "equipment", 20, "", 100, false));
     mInventory.push_back(item("Tires", "equipment", 30, "", 100, false));
@@ -15,8 +15,8 @@ int player::get_money() const {
     return mMoney;
 }
 
-int player::get_food() const {
-    return mFood;
+int player::get_fuel() const {
+    return mFuel;
 }
 
 void player::add_money(int pAmount) {
@@ -27,13 +27,13 @@ void player::spend_money(int pAmount) {
     mMoney = std::max(0, mMoney - pAmount);
 }
 
-void player::add_food(int pAmount) {
-    mFood += pAmount;
+void player::add_fuel(int pAmount) {
+    mFuel += pAmount;
 }
 
-void player::spend_food() {
-    if (mFood > 0) {
-        mFood--;
+void player::spend_fuel() {
+    if (mFuel > 0) {
+        mFuel--;
     }
 }
 
@@ -66,11 +66,11 @@ void player::sell_item(size_t pIndex) {
 }
 
 bool player::is_game_over() const {
-    return mMoney <= 0 && mFood <= 0;
+    return mMoney <= 0 && mFuel <= 0;
 }
 
 void player::show_status() const {
-    std::cout << "Money: " << mMoney << " | Fuel: " << mFood << std::endl;
+    std::cout << "Money: " << mMoney << " | Fuel: " << mFuel << std::endl;
     std::cout << "Inventory:";
     for (const auto& item : mInventory) {
         std::cout << item.mName << " (" << item.mType;
@@ -92,7 +92,7 @@ void player::show_status() const {
 bool player::save(const std::string &pFilename) const {
     json j;
     j["money"] = mMoney;
-    j["food"] = mFood;
+    j["food"] = mFuel;
     j["inventory"] = json::array();
 
     for (const auto& item : mInventory) {
@@ -147,7 +147,7 @@ bool player::load(const std::string &pFilename) {
         file.close();
 
         mMoney = j.value("money", 500);
-        mFood = j.value("food", 10);
+        mFuel = j.value("food", 10);
         mInventory.clear();
 
         for (const auto& item_index : j["inventory"]) {
