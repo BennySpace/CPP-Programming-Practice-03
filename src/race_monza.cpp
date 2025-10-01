@@ -12,7 +12,7 @@ void race_monza::drive(player& pPlayer, const std::string& pMod) {
         return;
     }
 
-    pPlayer.spend_food();
+    pPlayer.spend_fuel();
 
     for (auto& item : pPlayer.get_inventory()) {
         if (item.mType == "equipment" && item.mName == pMod && !item.mIsBroken) {

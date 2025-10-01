@@ -3,7 +3,7 @@
 
 #include "race.h"
 
-class race_monza : public race {
+class race_monza final : public race {
 public:
     race_monza();
 
