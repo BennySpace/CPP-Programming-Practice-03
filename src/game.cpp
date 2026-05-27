@@ -5,6 +5,21 @@
 #include <iostream>
 #include <limits>
 
+namespace {
+int read_int() {
+    int value;
+
+    while (!(std::cin >> value)) {
+        std::cout << "Invalid input. Please enter a number: ";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    return value;
+}
+}
+
 game::game() {
     mPlayer.load(mSaveFile);
     mRaces.push_back(new race_monaco());
@@ -21,10 +36,7 @@ game::~game() {
 void game::run() {
     while (!mPlayer.is_game_over()) {
         show_main_menu();
-        int choice;
-        std::cin >> choice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        handle_main_menu(choice);
+        handle_main_menu(read_int());
     }
 
     std::cout << "Game over! You ran out if money and fuel." << std::endl;
@@ -72,9 +84,7 @@ void game::choose_race() {
     }
 
     std::cout << "Choose a race (0 to return): ";
-    int choice;
-    std::cin >> choice;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    int choice = read_int();
 
     if (choice >= 1 && choice <= static_cast<int>(mRaces.size())) {
         start_race(mRaces[choice - 1]);
@@ -106,9 +116,7 @@ void game::start_race(race* pRace) {
         std::cout << "1. Apex-25 WG 'Wet Grip' (specialized tread for wet conditions)" << std::endl;
         std::cout << "0. Return to HQ" << std::endl;
         std::cout << "Choice: ";
-        int choice;
-        std::cin >> choice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        int choice = read_int();
         std::string equipment;
 
         switch (choice) {
@@ -144,9 +152,7 @@ void game::visit_shop() {
     std::cout << "6. Repair mod" << std::endl;
     std::cout << "0. Return to HQ" << std::endl;
     std::cout << "Choose an action: " << std::endl;
-    int choice;
-    std::cin >> choice;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    int choice = read_int();
 
     switch (choice) {
         case 1: {
@@ -203,9 +209,7 @@ void game::visit_shop() {
             }
 
             std::cout << "Choose item to sell (0 to cancel): ";
-            int itemChoice;
-            std::cin >> itemChoice;
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            int itemChoice = read_int();
 
             if (itemChoice > 0 && itemChoice < inventory.size()) {
                 mPlayer.sell_item(itemChoice - 1);
@@ -239,9 +243,7 @@ void game::visit_shop() {
             }
 
             std::cout << "Choose mod to repair (0 to cancel): ";
-            int itemChoice;
-            std::cin >> itemChoice;
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            int itemChoice = read_int();
 
             if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
                 mPlayer.repair_equipment(itemChoice - 1, inventory[itemChoice - 1].mValue / 2);
@@ -273,9 +275,7 @@ void game::visit_museum() {
     std::cout << "2. Donate loot" << std::endl;
     std::cout << "0. Return to HQ" << std::endl;
     std::cout << "Choose an action: ";
-    int choice;
-    std::cin >> choice;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    int choice = read_int();
 
     switch (choice) {
         case 1: {
@@ -298,9 +298,7 @@ void game::visit_museum() {
             }
 
             std::cout << "Choose item to donate (0 to cancel): ";
-            int itemChoice;
-            std::cin >> itemChoice;
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            int itemChoice = read_int();
 
             if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
                 mPlayer.donate_to_museum(itemChoice - 1);
