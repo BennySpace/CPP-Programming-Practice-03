@@ -8,10 +8,18 @@
 
 using json = nlohmann::json;
 
+namespace {
+constexpr int kDefaultEquipmentDurability = 100;
+
+item create_default_equipment(const std::string& pName, int pCost) {
+    return item(pName, "equipment", pCost, "", kDefaultEquipmentDurability, false);
+}
+}
+
 player::player() : mMoney(500), mFuel(10) {
-    mInventory.push_back(item("Aerodynamics", "equipment", 10, "", 100, false));
-    mInventory.push_back(item("Engine", "equipment", 20, "", 100, false));
-    mInventory.push_back(item("Tires", "equipment", 30, "", 100, false));
+    mInventory.push_back(create_default_equipment("Aerodynamics", 10));
+    mInventory.push_back(create_default_equipment("Engine", 20));
+    mInventory.push_back(create_default_equipment("Tires", 30));
 }
 
 int player::get_money() const {
@@ -353,7 +361,7 @@ bool player::buy_mod(const std::string &pModName, int pCost) {
     }
 
     spend_money(pCost);
-    add_item(item(pModName, "equipment", pCost, "", 100, false));
+    add_item(create_default_equipment(pModName, pCost));
     std::cout << "Purchased " << pModName << " mod for " << pCost << " money." << std::endl;
     return true;
 }
@@ -376,7 +384,7 @@ bool player::repair_equipment(size_t pIndex, int pCost) {
 
     spend_money(pCost);
     mInventory[pIndex].mIsBroken = false;
-    mInventory[pIndex].mDurability = 100;
+    mInventory[pIndex].mDurability = kDefaultEquipmentDurability;
     std::cout << "Repaired " << mInventory[pIndex].mName << " mod for " << pCost << " money." << std::endl;
 
     return true;
