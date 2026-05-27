@@ -33,6 +33,26 @@ std::vector<size_t> collect_inventory_indexes_by_type(const std::vector<item>& p
 
     return indexes;
 }
+
+std::string choose_race_mod() {
+    while (true) {
+        std::cout << "\nChoose car modification for race:" << std::endl;
+        std::cout << "1. Aerodynamics (advanced wing profiles for better cornering grip)" << std::endl;
+        std::cout << "2. Engine (tuned for maximum power output)" << std::endl;
+        std::cout << "3. Tires (specialized compound for changing track conditions)" << std::endl;
+        std::cout << "0. Return to HQ" << std::endl;
+        std::cout << "Choice: ";
+
+        switch (read_int()) {
+            case 1: return "Aerodynamics";
+            case 2: return "Engine";
+            case 3: return "Tires";
+            case 0: return "";
+            default:
+                std::cout << "Invalid choice, try again." << std::endl;
+        }
+    }
+}
 }
 
 game::game() {
@@ -139,6 +159,17 @@ void game::choose_race() {
 }
 
 void game::start_race(race* pRace) {
+    const std::string equipment = choose_race_mod();
+
+    if (equipment.empty()) {
+        return;
+    }
+
+    if (!mPlayer.has_mod(equipment)) {
+        std::cout << "You don't have a working " << equipment << " mod!" << std::endl;
+        return;
+    }
+
     if (mPlayer.get_money() < pRace->get_fee()) {
         std::cout << "Not enough money for the race!" << std::endl;
         return;
@@ -153,32 +184,15 @@ void game::start_race(race* pRace) {
     std::cout << "You embarked on " << pRace->get_name() << "!" << std::endl;
     pRace->print_text();
     pRace->effect(mPlayer);
-    mPlayer.save(mSaveFile);
-
-    while (mPlayer.get_fuel() > 0) {
-        std::cout << "\nChoose car modification for race:" << std::endl;
-        std::cout << "1. Apex-25 AW 'Aero Wing' (advanced wing profiles for better cornering grip)" << std::endl;
-        std::cout << "2. Apex-25 HP 'High Performance' (tuned for maximum power output)" << std::endl;
-        std::cout << "3. Apex-25 WG 'Wet Grip' (specialized tread for wet conditions)" << std::endl;
-        std::cout << "0. Return to HQ" << std::endl;
-        std::cout << "Choice: ";
-        int choice = read_int();
-        std::string equipment;
-
-        switch (choice) {
-            case 1: equipment = "AW"; break;
-            case 2: equipment = "HP"; break;
-            case 3: equipment = "WG"; break;
-            case 0: return;
-            default: std::cout << "Invalid choice, try again." << std::endl; continue;
-        }
-
-        pRace->drive(mPlayer, equipment);
-        mPlayer.show_status();
+    if (mPlayer.get_fuel() <= 0) {
+        std::cout << "Race conditions drained your fuel before the main lap. Returning to HQ." << std::endl;
         mPlayer.save(mSaveFile);
+        return;
     }
 
-    std::cout << "Out of fuel! Returning to HQ." << std::endl;
+    pRace->drive(mPlayer, equipment);
+    mPlayer.show_status();
+    mPlayer.save(mSaveFile);
 }
 
 void game::visit_shop() {

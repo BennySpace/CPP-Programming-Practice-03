@@ -18,7 +18,7 @@ void race_monza::drive(player& pPlayer, const std::string& pMod) {
         if (item.mType == "equipment" && item.mName == pMod && !item.mIsBroken) {
             std::uniform_int_distribution<int> dist(1, 100);
 
-            if (dist(mRandomNumberGenerator) <= 15) {
+            if (dist(mRandomNumberGenerator) <= MONZA_MOD_WEAR_CHANCE) {
                 item.mDurability = std::max(0, item.mDurability - 20);
                 std::cout << pMod << " mod took wear! Durability now: " << item.mDurability << std::endl;
 
@@ -35,13 +35,13 @@ void race_monza::drive(player& pPlayer, const std::string& pMod) {
     std::uniform_int_distribution<int> dist(1, 100);
     int chance = dist(mRandomNumberGenerator);
 
-    if (pMod == "Aerodynamics" && chance <= 15) {
+    if (pMod == "Aerodynamics" && chance <= MONZA_AW_LOOT_CHANCE) {
         pPlayer.add_item(item("Trophy Medal", "loot", 80));
         std::cout << "You won a Trophy Medal!" << std::endl;
-    } else if (pMod == "Engine" && chance <= 10) {
+    } else if (pMod == "Engine" && chance <= MONZA_HP_LOOT_CHANCE) {
         pPlayer.add_item(item("Aero Wing Part", "loot", 200));
         std::cout << "You found an Aero Wing Part!" << std::endl;
-    } else if (pMod == "Tires" && chance <= 5) {
+    } else if (pMod == "Tires" && chance <= MONZA_WG_LOOT_CHANCE) {
         pPlayer.add_item(item("Brake System", "loot", 300));
         std::cout << "You found a Brake System!" << std::endl;
     } else {
@@ -54,7 +54,7 @@ void race_monza::effect(player& pPlayer) {
     std::uniform_int_distribution<int> dist(1, 100);
     int chance = dist(mRandomNumberGenerator);
 
-    if (chance <= 10) {
+    if (chance <= MONZA_ITEM_LOSS_CHANCE) {
         const auto& inventory = pPlayer.get_inventory();
 
         if (!inventory.empty()) {

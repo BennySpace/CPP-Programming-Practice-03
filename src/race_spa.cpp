@@ -18,7 +18,7 @@ void race_spa::drive(player& pPlayer, const std::string& pMod) {
         if (item.mType == "equipment" && item.mName == pMod && !item.mIsBroken) {
             std::uniform_int_distribution<int> dist(1, 100);
 
-            if (dist(mRandomNumberGenerator) <= 25) {
+            if (dist(mRandomNumberGenerator) <= SPA_MOD_WEAR_CHANCE) {
                 item.mDurability = std::max(0, item.mDurability - 15);
                 std::cout << pMod << " mod took wear! Durability now: " << item.mDurability << std::endl;
 
@@ -35,13 +35,13 @@ void race_spa::drive(player& pPlayer, const std::string& pMod) {
     std::uniform_int_distribution<int> dist(1, 100);
     int chance = dist(mRandomNumberGenerator);
 
-    if (pMod == "Aerodynamics" && chance <= 20) {
+    if (pMod == "Aerodynamics" && chance <= SPA_AW_LOOT_CHANCE) {
         pPlayer.add_item(item("Trophy Cap", "loot", 60));
         std::cout << "You won a Trophy Cap!" << std::endl;
-    } else if (pMod == "Engine" && chance <= 25) {
+    } else if (pMod == "Engine" && chance <= SPA_HP_LOOT_CHANCE) {
         pPlayer.add_item(item("Suspension Part", "loot", 100));
         std::cout << "You found a Suspension Part!" << std::endl;
-    } else if (pMod == "Tires" && chance <= 15) {
+    } else if (pMod == "Tires" && chance <= SPA_WG_LOOT_CHANCE) {
         pPlayer.add_item(item("Gearbox Component", "loot", 150));
         std::cout << "You found a Gearbox Component!" << std::endl;
     } else {
@@ -54,7 +54,7 @@ void race_spa::effect(player& pPlayer) {
     std::uniform_int_distribution<int> dist(1, 100);
     int chance = dist(mRandomNumberGenerator);
 
-    if (chance <= 25) {
+    if (chance <= SPA_RAIN_FUEL_CHANCE) {
         pPlayer.spend_fuel();
         std::cout << "Rain exhausted you! You consumed 1 extra food." << std::endl;
     }

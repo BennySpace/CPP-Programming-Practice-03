@@ -36,13 +36,13 @@ void race_monaco::drive(player& pPlayer, const std::string& pMod) {
     std::uniform_int_distribution<int> dist(1, 100);
     const int chance = dist(mRandomNumberGenerator);
 
-    if ( pMod == "AW" && chance <= MONACO_AW_LOOT_CHANCE) {
+    if (pMod == "Aerodynamics" && chance <= MONACO_AW_LOOT_CHANCE) {
         pPlayer.add_item(item("Podium Hat", "loot", 50));
         std::cout << "You won a Podium Hat!" << std::endl;
-    } else if (pMod == "HP" && chance <= MONACO_HP_LOOT_CHANCE) {
+    } else if (pMod == "Engine" && chance <= MONACO_HP_LOOT_CHANCE) {
         pPlayer.add_item(item("Engine Part", "loot", 80));
         std::cout << "You found and Engine Part!" << std::endl;
-    } else if (pMod == "WG" && chance <= MONACO_WG_LOOT_CHANCE) {
+    } else if (pMod == "Tires" && chance <= MONACO_WG_LOOT_CHANCE) {
         pPlayer.add_item(item("Tire Compound", "loot", 120));
         std::cout << "You found a Tire Compound!" << std::endl;
     } else {
