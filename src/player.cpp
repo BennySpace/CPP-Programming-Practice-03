@@ -282,7 +282,7 @@ bool player::buy_mod(const std::string &pModName, int pCost) {
     }
 
     spend_money(pCost);
-    add_item(item(pModName, "equipment", pCost));
+    add_item(item(pModName, "equipment", pCost, "", 100, false));
     std::cout << "Purchased " << pModName << " mod for " << pCost << " money." << std::endl;
     return true;
 }
