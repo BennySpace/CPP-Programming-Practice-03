@@ -98,7 +98,7 @@ int choose_listed_item(const std::vector<size_t>& pIndexes, const std::string& p
 std::string choose_race_mod(const player& pPlayer) {
     const auto& inventory = pPlayer.get_inventory();
 
-    auto describe_mod = [&inventory](const std::string& pModName) {
+    auto describe_mod = [&inventory](const std::string& pModName) -> std::string {
         for (const auto& item : inventory) {
             if (item.mType == "equipment" && item.mName == pModName) {
                 if (item.mIsBroken) {
@@ -148,7 +148,7 @@ game::game() {
     mRaces.push_back(std::make_unique<race_monza>());
 
     if (!hasSaveFile || !loadedSuccessfully) {
-        save_progress();
+        static_cast<void>(mPlayer.save(mSaveFile, true));
     }
 }
 
@@ -179,7 +179,7 @@ bool game::can_player_continue() const {
 }
 
 void game::save_progress() const {
-    mPlayer.save(mSaveFile, true);
+    static_cast<void>(mPlayer.save(mSaveFile, true));
 }
 
 void game::run() {
@@ -213,7 +213,7 @@ void game::handle_main_menu(int pChoice) {
         case 1: choose_race(); break;
         case 2: visit_shop(); break;
         case 3: visit_museum(); break;
-        case 0: mPlayer.save(mSaveFile); exit(0);
+        case 0: static_cast<void>(mPlayer.save(mSaveFile)); exit(0);
         default:
             std::cout << "Invalid choice, try again." << std::endl;
             pause_for_input();
