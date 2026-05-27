@@ -181,7 +181,7 @@ void game::start_race(race* pRace) {
     }
 
     mPlayer.spend_money(pRace->get_fee());
-    std::cout << "You embarked on " << pRace->get_name() << "!" << std::endl;
+    std::cout << "You entered the " << pRace->get_name() << "!" << std::endl;
     pRace->print_text();
     pRace->effect(mPlayer);
     if (mPlayer.get_fuel() <= 0) {
@@ -219,7 +219,7 @@ void game::visit_shop() {
             if (mPlayer.get_money() >= 50) {
                 mPlayer.spend_money(50);
                 mPlayer.add_fuel(5);
-                std::cout << "Purchased 5 units of of fuel" << std::endl;
+                std::cout << "Purchased 5 units of fuel." << std::endl;
                 mPlayer.save(mSaveFile);
             } else {
                 std::cout << "Not enough money." << std::endl;
@@ -258,7 +258,7 @@ void game::visit_shop() {
                 break;
             }
 
-            std::cout << "Look items: " << std::endl;
+            std::cout << "Loot items: " << std::endl;
             for (size_t i = 0; i < lootIndexes.size(); ++i) {
                 const auto& lootItem = inventory[lootIndexes[i]];
                 std::cout << i + 1 << ". " << lootItem.mName

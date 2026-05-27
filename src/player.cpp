@@ -71,7 +71,7 @@ void player::sell_item(size_t pIndex) {
         std::cout << "Sold " << mInventory[pIndex].mName << " for " << mInventory[pIndex].mValue << " money." << std::endl;
         mInventory.erase(mInventory.begin() + pIndex);
     } else {
-        std::cout << "Invalid item or nor a loot item." << std::endl;
+        std::cout << "Invalid item or not a loot item." << std::endl;
     }
 }
 
@@ -226,7 +226,7 @@ void player::donate_to_museum(size_t pIndex) {
     } else if (exhibit.mName == "Suspension Part") {
         exhibit.mDescription = "A suspension component for better handling.";
     } else if (exhibit.mName == "Gearbox Component") {
-        exhibit.mDescription = "A gearbox part for smooth shifing.";
+        exhibit.mDescription = "A gearbox part for smooth shifting.";
     } else if (exhibit.mName == "Trophy Medal") {
         exhibit.mDescription = "A medal from a Grand Prix victory.";
     } else if (exhibit.mName == "Aero Wing Part") {
@@ -294,7 +294,7 @@ bool player::repair_equipment(size_t pIndex, int pCost) {
     }
 
     if (!mInventory[pIndex].mIsBroken) {
-        std::cout << mInventory[pIndex].mName << " mod is not a broken." << std::endl;
+        std::cout << mInventory[pIndex].mName << " mod is not broken." << std::endl;
         return false;
     }
 

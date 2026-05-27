@@ -41,7 +41,7 @@ void race_monaco::drive(player& pPlayer, const std::string& pMod) {
         std::cout << "You won a Podium Hat!" << std::endl;
     } else if (pMod == "Engine" && chance <= MONACO_HP_LOOT_CHANCE) {
         pPlayer.add_item(item("Engine Part", "loot", 80));
-        std::cout << "You found and Engine Part!" << std::endl;
+        std::cout << "You found an Engine Part!" << std::endl;
     } else if (pMod == "Tires" && chance <= MONACO_WG_LOOT_CHANCE) {
         pPlayer.add_item(item("Tire Compound", "loot", 120));
         std::cout << "You found a Tire Compound!" << std::endl;
@@ -58,10 +58,10 @@ void race_monaco::effect(player& pPlayer) {
 
     if (chance <= MONACO_CRASH_CHANCE) {
         pPlayer.spend_money(10);
-        std::cout << "Water damaged your equipment! You spent 10 money on repairs." << std::endl;
+        std::cout << "A crash damaged your equipment! You spent 10 money on repairs." << std::endl;
     }
 }
 
 void race_monaco::print_text() const {
-    std::cout << "You're tired, but you must keep working underwater.\n";
+    std::cout << "You face Monaco's tight barriers and unforgiving corners.\n";
 }

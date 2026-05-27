@@ -56,7 +56,7 @@ void race_spa::effect(player& pPlayer) {
 
     if (chance <= SPA_RAIN_FUEL_CHANCE) {
         pPlayer.spend_fuel();
-        std::cout << "Rain exhausted you! You consumed 1 extra food." << std::endl;
+        std::cout << "Rain exhausted you! You consumed 1 extra fuel." << std::endl;
     }
 }
 
