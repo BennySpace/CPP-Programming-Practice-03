@@ -159,11 +159,11 @@ bool player::load(const std::string &pFilename) {
         file >> j;
         file.close();
 
-        mMoney = j.value("money", 500);
-        mFuel = j.value("fuel", j.value("food", 10));
-        mInventory.clear();
+        const int loadedMoney = j.value("money", 500);
+        const int loadedFuel = j.value("fuel", j.value("food", 10));
+        std::vector<item> loadedInventory;
 
-        for (const auto& item_index : j["inventory"]) {
+        for (const auto& item_index : j.value("inventory", json::array())) {
             item newItem(
                 item_index.value("name", ""),
                 item_index.value("type", ""),
@@ -176,12 +176,12 @@ bool player::load(const std::string &pFilename) {
                 newItem.mIsBroken = item_index.value("isBroken", false);
             }
 
-            mInventory.push_back(newItem);
+            loadedInventory.push_back(newItem);
         }
 
-        mMuseumCollection.clear();
+        std::vector<item> loadedMuseumCollection;
         for (const auto& exhibit : j.value("museum", json::array())) {
-            mMuseumCollection.push_back(item(
+            loadedMuseumCollection.push_back(item(
                 exhibit.value("name", ""),
                 exhibit.value("type", ""),
                 exhibit.value("value", 0),
@@ -189,7 +189,13 @@ bool player::load(const std::string &pFilename) {
             ));
         }
 
-        mMuseumRewards = j.value("museumRewards", std::vector<int>{});
+        const std::vector<int> loadedMuseumRewards = j.value("museumRewards", std::vector<int>{});
+
+        mMoney = loadedMoney;
+        mFuel = loadedFuel;
+        mInventory = std::move(loadedInventory);
+        mMuseumCollection = std::move(loadedMuseumCollection);
+        mMuseumRewards = loadedMuseumRewards;
     } catch (const json::exception& e) {
         std::cout << "Error loading save file: " << e.what() << std::endl;
         file.close();
