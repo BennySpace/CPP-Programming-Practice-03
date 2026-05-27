@@ -2,6 +2,7 @@
 #include "race_monza.h"
 #include "race_monaco.h"
 #include "race_spa.h"
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <limits>
@@ -9,6 +10,11 @@
 namespace {
 constexpr int kFuelPurchaseCost = 50;
 constexpr int kFallbackModPurchaseCost = 10;
+
+bool file_exists(const std::string& pFilename) {
+    std::ifstream file(pFilename);
+    return file.good();
+}
 
 int read_int() {
     int value;
@@ -105,10 +111,19 @@ std::string choose_race_mod() {
 }
 
 game::game() {
-    mPlayer.load(mSaveFile);
+    const bool hasSaveFile = file_exists(mSaveFile);
+
+    if (hasSaveFile) {
+        mPlayer.load(mSaveFile);
+    }
+
     mRaces.push_back(std::make_unique<race_monaco>());
     mRaces.push_back(std::make_unique<race_spa>());
     mRaces.push_back(std::make_unique<race_monza>());
+
+    if (!hasSaveFile) {
+        save_progress();
+    }
 }
 
 bool game::can_player_continue() const {
