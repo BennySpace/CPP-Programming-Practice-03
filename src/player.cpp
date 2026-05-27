@@ -1,7 +1,10 @@
 #include "player.h"
 #include "nlohmann/json.hpp"
-#include <iostream>
+#include <algorithm>
 #include <fstream>
+#include <iostream>
+#include <unordered_map>
+#include <unordered_set>
 
 using json = nlohmann::json;
 
@@ -53,6 +56,64 @@ bool player::has_mod(const std::string &pMod) const {
 
 const std::vector<item> & player::get_inventory() const {
     return mInventory;
+}
+
+int player::get_best_loot_value() const {
+    int totalSaleValue = 0;
+    std::unordered_set<std::string> museumItems;
+    std::unordered_map<std::string, int> cheapestDonationByName;
+
+    for (const auto& exhibit : mMuseumCollection) {
+        museumItems.insert(exhibit.mName);
+    }
+
+    for (const auto& item : mInventory) {
+        if (item.mType != "loot") {
+            continue;
+        }
+
+        totalSaleValue += item.mValue;
+
+        if (museumItems.find(item.mName) != museumItems.end()) {
+            continue;
+        }
+
+        const auto existingDonation = cheapestDonationByName.find(item.mName);
+        if (existingDonation == cheapestDonationByName.end() || item.mValue < existingDonation->second) {
+            cheapestDonationByName[item.mName] = item.mValue;
+        }
+    }
+
+    std::vector<int> donationCosts;
+    donationCosts.reserve(cheapestDonationByName.size());
+    for (const auto& [_, value] : cheapestDonationByName) {
+        donationCosts.push_back(value);
+    }
+
+    std::sort(donationCosts.begin(), donationCosts.end());
+
+    int bestLootValue = totalSaleValue;
+    int donatedCount = 0;
+    int donatedSaleValue = 0;
+    const size_t existingExhibits = mMuseumCollection.size();
+
+    for (const int donationCost : donationCosts) {
+        donatedSaleValue += donationCost;
+        donatedCount++;
+
+        int museumRewardValue = 0;
+        for (const int milestone : {3, 6, 9}) {
+            if (existingExhibits < static_cast<size_t>(milestone) &&
+                existingExhibits + static_cast<size_t>(donatedCount) >= static_cast<size_t>(milestone) &&
+                std::find(mMuseumRewards.begin(), mMuseumRewards.end(), milestone) == mMuseumRewards.end()) {
+                museumRewardValue += milestone == 3 ? 100 : (milestone == 6 ? 200 : 300);
+            }
+        }
+
+        bestLootValue = std::max(bestLootValue, totalSaleValue - donatedSaleValue + museumRewardValue);
+    }
+
+    return bestLootValue;
 }
 
 bool player::lose_item(size_t pIndex) {
