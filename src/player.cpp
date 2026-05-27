@@ -55,6 +55,16 @@ const std::vector<item> & player::get_inventory() const {
     return mInventory;
 }
 
+bool player::lose_item(size_t pIndex) {
+    if (pIndex < mInventory.size()) {
+        mInventory.erase(mInventory.begin() + pIndex);
+        return true;
+    }
+
+    std::cout << "Invalid item." << std::endl;
+    return false;
+}
+
 void player::sell_item(size_t pIndex) {
     if (pIndex < mInventory.size() && mInventory[pIndex].mType == "loot") {
         add_money(mInventory[pIndex].mValue);

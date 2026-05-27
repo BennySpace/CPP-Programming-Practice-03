@@ -61,8 +61,7 @@ void race_monza::effect(player& pPlayer) {
             std::uniform_int_distribution<size_t> itemDist(0, inventory.size() - 1);
             size_t index = itemDist(mRandomNumberGenerator);
             std::string itemName = inventory[index].mName;
-            pPlayer.sell_item(index);
-            pPlayer.spend_money(-inventory[index].mValue);
+            pPlayer.lose_item(index);
             std::cout << "High-speed vibrations caused you to lose your " << itemName << "!" << std::endl;
         }
     }
