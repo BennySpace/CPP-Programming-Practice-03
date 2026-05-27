@@ -102,14 +102,15 @@ void player::show_status() const {
 bool player::save(const std::string &pFilename) const {
     json j;
     j["money"] = mMoney;
-    j["food"] = mFuel;
+    j["fuel"] = mFuel;
     j["inventory"] = json::array();
 
     for (const auto& item : mInventory) {
         json itemJson = {
             {"name", item.mName},
             {"type", item.mType},
-            {"value", item.mValue}
+            {"value", item.mValue},
+            {"description", item.mDescription}
         };
 
         if (item.mType == "equipment") {
@@ -129,6 +130,8 @@ bool player::save(const std::string &pFilename) const {
             {"description", exhibit.mDescription}
         });
     }
+
+    j["museumRewards"] = mMuseumRewards;
 
     std::ofstream file(pFilename);
     if (!file.is_open()) {
@@ -157,14 +160,15 @@ bool player::load(const std::string &pFilename) {
         file.close();
 
         mMoney = j.value("money", 500);
-        mFuel = j.value("food", 10);
+        mFuel = j.value("fuel", j.value("food", 10));
         mInventory.clear();
 
         for (const auto& item_index : j["inventory"]) {
             item newItem(
                 item_index.value("name", ""),
                 item_index.value("type", ""),
-                item_index.value("value", 0)
+                item_index.value("value", 0),
+                item_index.value("description", "")
             );
 
             if (item_index.value("type", "") == "equipment") {
@@ -184,6 +188,8 @@ bool player::load(const std::string &pFilename) {
                 exhibit.value("description", "")
             ));
         }
+
+        mMuseumRewards = j.value("museumRewards", std::vector<int>{});
     } catch (const json::exception& e) {
         std::cout << "Error loading save file: " << e.what() << std::endl;
         file.close();
