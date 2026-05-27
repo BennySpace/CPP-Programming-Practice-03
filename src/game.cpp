@@ -2,6 +2,7 @@
 #include "race_monza.h"
 #include "race_monaco.h"
 #include "race_spa.h"
+#include <functional>
 #include <iostream>
 #include <limits>
 
@@ -22,11 +23,12 @@ int read_int() {
     return value;
 }
 
-std::vector<size_t> collect_inventory_indexes_by_type(const std::vector<item>& pInventory, const std::string& pType) {
+std::vector<size_t> collect_inventory_indexes(const std::vector<item>& pInventory,
+                                              const std::function<bool(const item&)>& pPredicate) {
     std::vector<size_t> indexes;
 
     for (size_t i = 0; i < pInventory.size(); ++i) {
-        if (pInventory[i].mType == pType) {
+        if (pPredicate(pInventory[i])) {
             indexes.push_back(i);
         }
     }
@@ -34,16 +36,46 @@ std::vector<size_t> collect_inventory_indexes_by_type(const std::vector<item>& p
     return indexes;
 }
 
-std::vector<size_t> collect_broken_equipment_indexes(const std::vector<item>& pInventory) {
-    std::vector<size_t> indexes;
+void print_inventory_selection(const std::vector<item>& pInventory,
+                               const std::vector<size_t>& pIndexes,
+                               const std::string& pHeader,
+                               const std::function<std::string(const item&)>& pDetails) {
+    std::cout << pHeader << std::endl;
+    for (size_t i = 0; i < pIndexes.size(); ++i) {
+        const auto& listedItem = pInventory[pIndexes[i]];
+        std::cout << i + 1 << ". " << listedItem.mName << pDetails(listedItem) << std::endl;
+    }
+}
 
-    for (size_t i = 0; i < pInventory.size(); ++i) {
-        if (pInventory[i].mType == "equipment" && pInventory[i].mIsBroken) {
-            indexes.push_back(i);
-        }
+std::vector<size_t> collect_inventory_indexes_by_type(const std::vector<item>& pInventory, const std::string& pType) {
+    return collect_inventory_indexes(pInventory, [&pType](const item& pItem) {
+        return pItem.mType == pType;
+    });
+}
+
+std::vector<size_t> collect_broken_equipment_indexes(const std::vector<item>& pInventory) {
+    return collect_inventory_indexes(pInventory, [](const item& pItem) {
+        return pItem.mType == "equipment" && pItem.mIsBroken;
+    });
+}
+
+int choose_listed_item(const std::vector<size_t>& pIndexes, const std::string& pPrompt) {
+    if (pIndexes.empty()) {
+        return -1;
     }
 
-    return indexes;
+    std::cout << pPrompt;
+    const int itemChoice = read_int();
+
+    if (itemChoice > 0 && itemChoice <= static_cast<int>(pIndexes.size())) {
+        return itemChoice - 1;
+    }
+
+    if (itemChoice != 0) {
+        std::cout << "Invalid choice, try again." << std::endl;
+    }
+
+    return -1;
 }
 
 std::string choose_race_mod() {
@@ -270,18 +302,13 @@ void game::visit_shop() {
                 break;
             }
 
-            std::cout << "Loot items: " << std::endl;
-            for (size_t i = 0; i < lootIndexes.size(); ++i) {
-                const auto& lootItem = inventory[lootIndexes[i]];
-                std::cout << i + 1 << ". " << lootItem.mName
-                          << " (value: " << lootItem.mValue << ")" << std::endl;
-            }
+            print_inventory_selection(inventory, lootIndexes, "Loot items:", [](const item& pItem) {
+                return " (value: " + std::to_string(pItem.mValue) + ")";
+            });
+            const int itemChoice = choose_listed_item(lootIndexes, "Choose item to sell (0 to cancel): ");
 
-            std::cout << "Choose item to sell (0 to cancel): ";
-            int itemChoice = read_int();
-
-            if (itemChoice > 0 && itemChoice <= static_cast<int>(lootIndexes.size())) {
-                mPlayer.sell_item(lootIndexes[itemChoice - 1]);
+            if (itemChoice >= 0) {
+                mPlayer.sell_item(lootIndexes[itemChoice]);
                 mPlayer.save(mSaveFile);
             }
 
@@ -297,18 +324,13 @@ void game::visit_shop() {
                 break;
             }
 
-            std::cout << "Broken mods:" << std::endl;
-            for (size_t i = 0; i < brokenEquipmentIndexes.size(); ++i) {
-                const auto& brokenItem = inventory[brokenEquipmentIndexes[i]];
-                std::cout << i + 1 << ". " << brokenItem.mName
-                          << " (repair cost: " << brokenItem.mValue / 2 << ")" << std::endl;
-            }
+            print_inventory_selection(inventory, brokenEquipmentIndexes, "Broken mods:", [](const item& pItem) {
+                return " (repair cost: " + std::to_string(pItem.mValue / 2) + ")";
+            });
+            const int itemChoice = choose_listed_item(brokenEquipmentIndexes, "Choose mod to repair (0 to cancel): ");
 
-            std::cout << "Choose mod to repair (0 to cancel): ";
-            int itemChoice = read_int();
-
-            if (itemChoice > 0 && itemChoice <= static_cast<int>(brokenEquipmentIndexes.size())) {
-                const size_t inventoryIndex = brokenEquipmentIndexes[itemChoice - 1];
+            if (itemChoice >= 0) {
+                const size_t inventoryIndex = brokenEquipmentIndexes[itemChoice];
                 mPlayer.repair_equipment(inventoryIndex, inventory[inventoryIndex].mValue / 2);
                 mPlayer.save(mSaveFile);
             }
@@ -354,18 +376,13 @@ void game::visit_museum() {
                 break;
             }
 
-            std::cout << "Loot items available for donation:" << std::endl;
-            for (size_t i = 0; i < lootIndexes.size(); ++i) {
-                const auto& lootItem = inventory[lootIndexes[i]];
-                std::cout << i + 1 << ". " << lootItem.mName << " (value: " << lootItem.mValue
-                                   << ")" << std::endl;
-            }
+            print_inventory_selection(inventory, lootIndexes, "Loot items available for donation:", [](const item& pItem) {
+                return " (value: " + std::to_string(pItem.mValue) + ")";
+            });
+            const int itemChoice = choose_listed_item(lootIndexes, "Choose item to donate (0 to cancel): ");
 
-            std::cout << "Choose item to donate (0 to cancel): ";
-            int itemChoice = read_int();
-
-            if (itemChoice > 0 && itemChoice <= static_cast<int>(lootIndexes.size())) {
-                mPlayer.donate_to_museum(lootIndexes[itemChoice - 1]);
+            if (itemChoice >= 0) {
+                mPlayer.donate_to_museum(lootIndexes[itemChoice]);
                 mPlayer.save(mSaveFile);
             }
 
