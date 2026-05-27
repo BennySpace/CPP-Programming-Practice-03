@@ -137,6 +137,10 @@ bool game::can_player_continue() const {
     return availableMoney >= fuelCost + equipmentCost + cheapestRaceFee;
 }
 
+void game::save_progress() const {
+    mPlayer.save(mSaveFile);
+}
+
 void game::run() {
     while (can_player_continue()) {
         show_main_menu();
@@ -167,7 +171,7 @@ void game::handle_main_menu(int pChoice) {
         case 1: choose_race(); break;
         case 2: visit_shop(); break;
         case 3: visit_museum(); break;
-        case 0: mPlayer.save(mSaveFile); exit(0);
+        case 0: save_progress(); exit(0);
         default: std::cout << "Invalid choice, try again." << std::endl;
     }
 }
@@ -192,7 +196,6 @@ void game::choose_race() {
 
     if (choice >= 1 && choice <= static_cast<int>(mRaces.size())) {
         start_race(mRaces[choice - 1].get());
-        mPlayer.save(mSaveFile);
     }
 }
 
@@ -224,13 +227,13 @@ void game::start_race(race* pRace) {
     pRace->effect(mPlayer);
     if (mPlayer.get_fuel() <= 0) {
         std::cout << "Race conditions drained your fuel before the main lap. Returning to HQ." << std::endl;
-        mPlayer.save(mSaveFile);
+        save_progress();
         return;
     }
 
     pRace->drive(mPlayer, equipment);
     mPlayer.show_status();
-    mPlayer.save(mSaveFile);
+    save_progress();
 }
 
 void game::visit_shop() {
@@ -258,7 +261,7 @@ void game::visit_shop() {
                 mPlayer.spend_money(50);
                 mPlayer.add_fuel(5);
                 std::cout << "Purchased 5 units of fuel." << std::endl;
-                mPlayer.save(mSaveFile);
+                save_progress();
             } else {
                 std::cout << "Not enough money." << std::endl;
             }
@@ -268,21 +271,21 @@ void game::visit_shop() {
 
         case 2: {
             if (mPlayer.buy_mod("Aerodynamics", 10)) {
-                mPlayer.save(mSaveFile);
+                save_progress();
             }
             break;
         }
 
         case 3: {
             if (mPlayer.buy_mod("Engine", 20)) {
-                mPlayer.save(mSaveFile);
+                save_progress();
             }
             break;
         }
 
         case 4: {
             if (mPlayer.buy_mod("Tires", 30)) {
-                mPlayer.save(mSaveFile);
+                save_progress();
             }
             break;
         }
@@ -303,7 +306,7 @@ void game::visit_shop() {
 
             if (itemChoice >= 0) {
                 mPlayer.sell_item(lootIndexes[itemChoice]);
-                mPlayer.save(mSaveFile);
+                save_progress();
             }
 
             break;
@@ -326,7 +329,7 @@ void game::visit_shop() {
             if (itemChoice >= 0) {
                 const size_t inventoryIndex = brokenEquipmentIndexes[itemChoice];
                 mPlayer.repair_equipment(inventoryIndex, inventory[inventoryIndex].mValue / 2);
-                mPlayer.save(mSaveFile);
+                save_progress();
             }
 
             break;
@@ -377,7 +380,7 @@ void game::visit_museum() {
 
             if (itemChoice >= 0) {
                 mPlayer.donate_to_museum(lootIndexes[itemChoice]);
-                mPlayer.save(mSaveFile);
+                save_progress();
             }
 
             break;
