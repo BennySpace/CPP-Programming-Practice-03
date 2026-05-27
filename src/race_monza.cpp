@@ -56,10 +56,17 @@ void race_monza::effect(player& pPlayer) {
 
     if (chance <= MONZA_ITEM_LOSS_CHANCE) {
         const auto& inventory = pPlayer.get_inventory();
+        std::vector<size_t> lootIndexes;
 
-        if (!inventory.empty()) {
-            std::uniform_int_distribution<size_t> itemDist(0, inventory.size() - 1);
-            size_t index = itemDist(mRandomNumberGenerator);
+        for (size_t i = 0; i < inventory.size(); ++i) {
+            if (inventory[i].mType == "loot") {
+                lootIndexes.push_back(i);
+            }
+        }
+
+        if (!lootIndexes.empty()) {
+            std::uniform_int_distribution<size_t> itemDist(0, lootIndexes.size() - 1);
+            size_t index = lootIndexes[itemDist(mRandomNumberGenerator)];
             std::string itemName = inventory[index].mName;
             pPlayer.lose_item(index);
             std::cout << "High-speed vibrations caused you to lose your " << itemName << "!" << std::endl;
