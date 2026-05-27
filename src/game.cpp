@@ -237,155 +237,161 @@ void game::start_race(race* pRace) {
 }
 
 void game::visit_shop() {
-    system("CLS");
-    std::cout << R"(
+    while (true) {
+        system("CLS");
+        std::cout << R"(
  ______                   ______
 /_  __/__ ___ ___ _      / __/ /  ___  ___
  / / / -_) _ `/  ' \    _\ \/ _ \/ _ \/ _ \
 /_/  \__/\_,_/_/_/_/   /___/_//_/\___/ .__/
                                     /_/
     )" << std::endl;
-    std::cout << "1. Buy fuel (50 money for 5 units)" << std::endl;
-    std::cout << "2. Buy Aerodynamics (10 money)" << std::endl;
-    std::cout << "3. Buy Engine (20 money)" << std::endl;
-    std::cout << "4. Buy Tires (30 money)" << std::endl;
-    std::cout << "5. Sell loot" << std::endl;
-    std::cout << "6. Repair mod" << std::endl;
-    std::cout << "0. Return to HQ" << std::endl;
-    std::cout << "Choose an action: " << std::endl;
-    int choice = read_int();
+        std::cout << "1. Buy fuel (50 money for 5 units)" << std::endl;
+        std::cout << "2. Buy Aerodynamics (10 money)" << std::endl;
+        std::cout << "3. Buy Engine (20 money)" << std::endl;
+        std::cout << "4. Buy Tires (30 money)" << std::endl;
+        std::cout << "5. Sell loot" << std::endl;
+        std::cout << "6. Repair mod" << std::endl;
+        std::cout << "0. Return to HQ" << std::endl;
+        std::cout << "Choose an action: " << std::endl;
+        int choice = read_int();
 
-    switch (choice) {
-        case 1: {
-            if (mPlayer.get_money() >= 50) {
-                mPlayer.spend_money(50);
-                mPlayer.add_fuel(5);
-                std::cout << "Purchased 5 units of fuel." << std::endl;
-                save_progress();
-            } else {
-                std::cout << "Not enough money." << std::endl;
-            }
+        switch (choice) {
+            case 1: {
+                if (mPlayer.get_money() >= 50) {
+                    mPlayer.spend_money(50);
+                    mPlayer.add_fuel(5);
+                    std::cout << "Purchased 5 units of fuel." << std::endl;
+                    save_progress();
+                } else {
+                    std::cout << "Not enough money." << std::endl;
+                }
 
-            break;
-        }
-
-        case 2: {
-            if (mPlayer.buy_mod("Aerodynamics", 10)) {
-                save_progress();
-            }
-            break;
-        }
-
-        case 3: {
-            if (mPlayer.buy_mod("Engine", 20)) {
-                save_progress();
-            }
-            break;
-        }
-
-        case 4: {
-            if (mPlayer.buy_mod("Tires", 30)) {
-                save_progress();
-            }
-            break;
-        }
-
-        case 5: {
-            const auto& inventory = mPlayer.get_inventory();
-            const auto lootIndexes = collect_inventory_indexes_by_type(inventory, "loot");
-
-            if (lootIndexes.empty()) {
-                std::cout << "No items to sell.";
                 break;
             }
 
-            print_inventory_selection(inventory, lootIndexes, "Loot items:", [](const item& pItem) {
-                return " (value: " + std::to_string(pItem.mValue) + ")";
-            });
-            const int itemChoice = choose_listed_item(lootIndexes, "Choose item to sell (0 to cancel): ");
-
-            if (itemChoice >= 0) {
-                mPlayer.sell_item(lootIndexes[itemChoice]);
-                save_progress();
-            }
-
-            break;
-        }
-
-        case 6: {
-            const auto& inventory = mPlayer.get_inventory();
-            const auto brokenEquipmentIndexes = collect_broken_equipment_indexes(inventory);
-
-            if (brokenEquipmentIndexes.empty()) {
-                std::cout << "No broken mod to repair." << std::endl;
+            case 2: {
+                if (mPlayer.buy_mod("Aerodynamics", 10)) {
+                    save_progress();
+                }
                 break;
             }
 
-            print_inventory_selection(inventory, brokenEquipmentIndexes, "Broken mods:", [](const item& pItem) {
-                return " (repair cost: " + std::to_string(pItem.mValue / 2) + ")";
-            });
-            const int itemChoice = choose_listed_item(brokenEquipmentIndexes, "Choose mod to repair (0 to cancel): ");
-
-            if (itemChoice >= 0) {
-                const size_t inventoryIndex = brokenEquipmentIndexes[itemChoice];
-                mPlayer.repair_equipment(inventoryIndex, inventory[inventoryIndex].mValue / 2);
-                save_progress();
+            case 3: {
+                if (mPlayer.buy_mod("Engine", 20)) {
+                    save_progress();
+                }
+                break;
             }
 
-            break;
-        }
+            case 4: {
+                if (mPlayer.buy_mod("Tires", 30)) {
+                    save_progress();
+                }
+                break;
+            }
 
-        case 0: {
-            break;
-        }
+            case 5: {
+                const auto& inventory = mPlayer.get_inventory();
+                const auto lootIndexes = collect_inventory_indexes_by_type(inventory, "loot");
 
-        default: {
-            std::cout << "Invalid choice." << std::endl;
+                if (lootIndexes.empty()) {
+                    std::cout << "No items to sell.";
+                    break;
+                }
+
+                print_inventory_selection(inventory, lootIndexes, "Loot items:", [](const item& pItem) {
+                    return " (value: " + std::to_string(pItem.mValue) + ")";
+                });
+                const int itemChoice = choose_listed_item(lootIndexes, "Choose item to sell (0 to cancel): ");
+
+                if (itemChoice >= 0) {
+                    mPlayer.sell_item(lootIndexes[itemChoice]);
+                    save_progress();
+                }
+
+                break;
+            }
+
+            case 6: {
+                const auto& inventory = mPlayer.get_inventory();
+                const auto brokenEquipmentIndexes = collect_broken_equipment_indexes(inventory);
+
+                if (brokenEquipmentIndexes.empty()) {
+                    std::cout << "No broken mod to repair." << std::endl;
+                    break;
+                }
+
+                print_inventory_selection(inventory, brokenEquipmentIndexes, "Broken mods:", [](const item& pItem) {
+                    return " (repair cost: " + std::to_string(pItem.mValue / 2) + ")";
+                });
+                const int itemChoice = choose_listed_item(brokenEquipmentIndexes, "Choose mod to repair (0 to cancel): ");
+
+                if (itemChoice >= 0) {
+                    const size_t inventoryIndex = brokenEquipmentIndexes[itemChoice];
+                    mPlayer.repair_equipment(inventoryIndex, inventory[inventoryIndex].mValue / 2);
+                    save_progress();
+                }
+
+                break;
+            }
+
+            case 0: {
+                return;
+            }
+
+            default: {
+                std::cout << "Invalid choice." << std::endl;
+            }
         }
     }
 }
 
 void game::visit_museum() {
-    system("CLS");
-    std::cout << R"(
+    while (true) {
+        system("CLS");
+        std::cout << R"(
    ____  ___    __  ___
   / __/ <  /   /  |/  /_ _____ ___ __ ____ _
  / _/   / /   / /|_/ / // (_-</ -_) // /  ' \
 /_/    /_/   /_/  /_/\_,_/___/\__/\_,_/_/_/_/
     )" << std::endl;
-    std::cout << "1. View collection" << std::endl;
-    std::cout << "2. Donate loot" << std::endl;
-    std::cout << "0. Return to HQ" << std::endl;
-    std::cout << "Choose an action: ";
-    int choice = read_int();
+        std::cout << "1. View collection" << std::endl;
+        std::cout << "2. Donate loot" << std::endl;
+        std::cout << "0. Return to HQ" << std::endl;
+        std::cout << "Choose an action: ";
+        int choice = read_int();
 
-    switch (choice) {
-        case 1: {
-            mPlayer.show_museum();
-            break;
-        }
-        case 2: {
-            const auto& inventory = mPlayer.get_inventory();
-            const auto lootIndexes = collect_inventory_indexes_by_type(inventory, "loot");
-
-            if (lootIndexes.empty()) {
-                std::cout << "No items to donate." << std::endl;
+        switch (choice) {
+            case 1: {
+                mPlayer.show_museum();
                 break;
             }
+            case 2: {
+                const auto& inventory = mPlayer.get_inventory();
+                const auto lootIndexes = collect_inventory_indexes_by_type(inventory, "loot");
 
-            print_inventory_selection(inventory, lootIndexes, "Loot items available for donation:", [](const item& pItem) {
-                return " (value: " + std::to_string(pItem.mValue) + ")";
-            });
-            const int itemChoice = choose_listed_item(lootIndexes, "Choose item to donate (0 to cancel): ");
+                if (lootIndexes.empty()) {
+                    std::cout << "No items to donate." << std::endl;
+                    break;
+                }
 
-            if (itemChoice >= 0) {
-                mPlayer.donate_to_museum(lootIndexes[itemChoice]);
-                save_progress();
+                print_inventory_selection(inventory, lootIndexes, "Loot items available for donation:", [](const item& pItem) {
+                    return " (value: " + std::to_string(pItem.mValue) + ")";
+                });
+                const int itemChoice = choose_listed_item(lootIndexes, "Choose item to donate (0 to cancel): ");
+
+                if (itemChoice >= 0) {
+                    mPlayer.donate_to_museum(lootIndexes[itemChoice]);
+                    save_progress();
+                }
+
+                break;
             }
-
-            break;
+            case 0:
+                return;
+            default:
+                std::cout << "Invalid choice, try again." << std::endl;
         }
-        case 0: break;
-        default: std::cout << "Invalid choice, try again." << std::endl;
     }
 }
