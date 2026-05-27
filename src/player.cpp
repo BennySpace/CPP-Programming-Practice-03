@@ -336,7 +336,7 @@ void player::donate_to_museum(size_t pIndex) {
 
 void player::show_museum() const {
     if (mMuseumCollection.empty()) {
-        std::cout << "The museum is empty. Donate some loot to display!";
+        std::cout << "The museum is empty. Donate some loot to display!" << std::endl;
         return;
     }
 
@@ -344,8 +344,13 @@ void player::show_museum() const {
     std::cout << "Total exhibits: " << mMuseumCollection.size() << std::endl;
 
     for (const auto& exhibit : mMuseumCollection) {
-        std::cout << "- " << exhibit.mName << " (" << exhibit.mType << ", value: " << exhibit.mValue << ")" << std::endl;
-        std::cout << " Description: " << exhibit.mDescription << std::endl;
+        std::cout << "- " << exhibit.mName << std::endl;
+        std::cout << "  Type: " << exhibit.mType << std::endl;
+        std::cout << "  Value: " << exhibit.mValue << std::endl;
+
+        if (!exhibit.mDescription.empty()) {
+            std::cout << "  Description: " << exhibit.mDescription << std::endl;
+        }
     }
 }
 
