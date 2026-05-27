@@ -50,7 +50,7 @@ void race_spa::drive(player& pPlayer, const std::string& pMod) {
 }
 
 void race_spa::effect(player& pPlayer) {
-    std::cout << "The changing weather conditions affect your performance" << std::endl;
+    std::cout << "The changing weather conditions affect your performance." << std::endl;
     std::uniform_int_distribution<int> dist(1, 100);
     int chance = dist(mRandomNumberGenerator);
 

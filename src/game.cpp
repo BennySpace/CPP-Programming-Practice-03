@@ -89,17 +89,37 @@ int choose_listed_item(const std::vector<size_t>& pIndexes, const std::string& p
 
     if (itemChoice != 0) {
         std::cout << "Invalid choice, try again." << std::endl;
+        pause_for_input();
     }
 
     return -1;
 }
 
-std::string choose_race_mod() {
+std::string choose_race_mod(const player& pPlayer) {
+    const auto& inventory = pPlayer.get_inventory();
+
+    auto describe_mod = [&inventory](const std::string& pModName) {
+        for (const auto& item : inventory) {
+            if (item.mType == "equipment" && item.mName == pModName) {
+                if (item.mIsBroken) {
+                    return " [BROKEN]";
+                }
+
+                return " [durability: " + std::to_string(item.mDurability) + "]";
+            }
+        }
+
+        return std::string(" [missing]");
+    };
+
     while (true) {
         std::cout << "\nChoose car modification for race:" << std::endl;
-        std::cout << "1. Aerodynamics (advanced wing profiles for better cornering grip)" << std::endl;
-        std::cout << "2. Engine (tuned for maximum power output)" << std::endl;
-        std::cout << "3. Tires (specialized compound for changing track conditions)" << std::endl;
+        std::cout << "1. Aerodynamics (advanced wing profiles for better cornering grip)"
+                  << describe_mod("Aerodynamics") << std::endl;
+        std::cout << "2. Engine (tuned for maximum power output)"
+                  << describe_mod("Engine") << std::endl;
+        std::cout << "3. Tires (specialized compound for changing track conditions)"
+                  << describe_mod("Tires") << std::endl;
         std::cout << "0. Return to HQ" << std::endl;
         std::cout << "Choice: ";
 
@@ -117,16 +137,17 @@ std::string choose_race_mod() {
 
 game::game() {
     const bool hasSaveFile = file_exists(mSaveFile);
+    bool loadedSuccessfully = false;
 
     if (hasSaveFile) {
-        mPlayer.load(mSaveFile);
+        loadedSuccessfully = mPlayer.load(mSaveFile);
     }
 
     mRaces.push_back(std::make_unique<race_monaco>());
     mRaces.push_back(std::make_unique<race_spa>());
     mRaces.push_back(std::make_unique<race_monza>());
 
-    if (!hasSaveFile) {
+    if (!hasSaveFile || !loadedSuccessfully) {
         save_progress();
     }
 }
@@ -158,7 +179,7 @@ bool game::can_player_continue() const {
 }
 
 void game::save_progress() const {
-    mPlayer.save(mSaveFile);
+    mPlayer.save(mSaveFile, true);
 }
 
 void game::run() {
@@ -168,6 +189,7 @@ void game::run() {
     }
 
     std::cout << "Game over! You don't have enough resources to keep racing." << std::endl;
+    pause_for_input();
 }
 
 void game::show_main_menu() {
@@ -178,7 +200,7 @@ void game::show_main_menu() {
  / / / -_) _ `/  ' \     / _  / / /_/ /
 /_/  \__/\_,_/_/_/_/    /_//_/  \___\_\
     )" << std::endl;
-    std::cout << "1. Enter a Grand-Prix" << std::endl;
+    std::cout << "1. Enter a Grand Prix" << std::endl;
     std::cout << "2. Visit the Team Shop" << std::endl;
     std::cout << "3. Visit the F1 Museum" << std::endl;
     std::cout << "0. Exit game" << std::endl;
@@ -191,7 +213,7 @@ void game::handle_main_menu(int pChoice) {
         case 1: choose_race(); break;
         case 2: visit_shop(); break;
         case 3: visit_museum(); break;
-        case 0: save_progress(); exit(0);
+        case 0: mPlayer.save(mSaveFile); exit(0);
         default:
             std::cout << "Invalid choice, try again." << std::endl;
             pause_for_input();
@@ -225,18 +247,6 @@ void game::choose_race() {
 }
 
 void game::start_race(race* pRace) {
-    const std::string equipment = choose_race_mod();
-
-    if (equipment.empty()) {
-        return;
-    }
-
-    if (!mPlayer.has_mod(equipment)) {
-        std::cout << "You don't have a working " << equipment << " mod!" << std::endl;
-        pause_for_input();
-        return;
-    }
-
     if (mPlayer.get_money() < pRace->get_fee()) {
         std::cout << "Not enough money for the race!" << std::endl;
         pause_for_input();
@@ -245,6 +255,18 @@ void game::start_race(race* pRace) {
 
     if (mPlayer.get_fuel() <= 0) {
         std::cout << "Not enough fuel for the race! Visit the shop to buy fuel." << std::endl;
+        pause_for_input();
+        return;
+    }
+
+    const std::string equipment = choose_race_mod(mPlayer);
+
+    if (equipment.empty()) {
+        return;
+    }
+
+    if (!mPlayer.has_mod(equipment)) {
+        std::cout << "You don't have a working " << equipment << " mod!" << std::endl;
         pause_for_input();
         return;
     }
@@ -379,7 +401,7 @@ void game::visit_shop() {
             }
 
             default: {
-                std::cout << "Invalid choice." << std::endl;
+                std::cout << "Invalid choice, try again." << std::endl;
                 pause_for_input();
             }
         }

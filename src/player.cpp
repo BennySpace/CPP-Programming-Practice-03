@@ -172,7 +172,7 @@ void player::show_status() const {
     }
 }
 
-bool player::save(const std::string &pFilename) const {
+bool player::save(const std::string &pFilename, bool pSilent) const {
     json j;
     j["money"] = mMoney;
     j["fuel"] = mFuel;
@@ -215,7 +215,10 @@ bool player::save(const std::string &pFilename) const {
     file << j.dump(4);
     file.close();
 
-    std::cout << "Game saved successfully." << std::endl;
+    if (!pSilent) {
+        std::cout << "Game saved successfully." << std::endl;
+    }
+
     return true;
 }
 
@@ -356,7 +359,7 @@ void player::show_museum() const {
 
 bool player::buy_mod(const std::string &pModName, int pCost) {
     if (has_mod(pModName)) {
-        std::cout << "You already have a working " << pModName << " !" << std::endl;
+        std::cout << "You already have a working " << pModName << "!" << std::endl;
         return false;
     }
 

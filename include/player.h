@@ -29,7 +29,7 @@ public:
     void sell_item(size_t pIndex);
     [[nodiscard]] bool is_game_over() const;
     void show_status() const;
-    [[nodiscard]] bool save(const std::string& pFilename) const;
+    [[nodiscard]] bool save(const std::string& pFilename, bool pSilent = false) const;
     bool load(const std::string& pFilename);
     void donate_to_museum(size_t pIndex);
     void show_museum() const;

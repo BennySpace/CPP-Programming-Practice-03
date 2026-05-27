@@ -26,9 +26,9 @@ The application supports the following operations:
    cmake ..
    cmake --build .
    ```
-5. Run the executable:
+5. Run the executable from the build directory:
    ```bash
-   ./out/build/x64-Debug/FormulaOneSimulator
+   .\FormulaOneSimulator.exe
    ```
 
 ## Usage
