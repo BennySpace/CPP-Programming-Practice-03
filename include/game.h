@@ -3,13 +3,14 @@
 
 #include "player.h"
 #include "race.h"
+#include <string>
 #include <vector>
 
 class game {
 private:
     player mPlayer;
     std::vector<race*> mRaces;
-    const std::string mSaveFile = "savegame.json";
+    const std::string mSaveFile = SAVE_FILE_PATH;
 
 public:
     game();

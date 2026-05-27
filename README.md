@@ -10,7 +10,7 @@ The application supports the following operations:
 3. **Buy and repair equipment**: Maintain car modifications such as aerodynamics, engine, and tires.
 4. **Collect and sell loot**: Receive race-related items and sell them in the shop for money.
 5. **Build a museum collection**: Donate unique loot items to the museum and unlock milestone rewards.
-6. **Save progress**: Store player progress in `savegame.json` so the game can be continued later.
+6. **Save progress**: Store player progress in the project-root `savegame.json` so the game can be continued later.
 
 ## Build Instructions
 

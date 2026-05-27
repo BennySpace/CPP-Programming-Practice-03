@@ -30,6 +30,9 @@ set(SOURCES
 add_executable(FormulaOneSimulator ${HEADERS} ${SOURCES})
 target_compile_features(FormulaOneSimulator PRIVATE cxx_std_17)
 target_include_directories(FormulaOneSimulator PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_compile_definitions(FormulaOneSimulator PRIVATE
+        SAVE_FILE_PATH="${CMAKE_SOURCE_DIR}/savegame.json"
+)
 
 if(MSVC)
     target_compile_options(FormulaOneSimulator PRIVATE /W4 /permissive-)
