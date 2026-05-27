@@ -18,6 +18,7 @@ public:
     void run();
 
 private:
+    [[nodiscard]] bool can_player_continue() const;
     void show_main_menu();
     void handle_main_menu(int pChoice);
     void choose_race();

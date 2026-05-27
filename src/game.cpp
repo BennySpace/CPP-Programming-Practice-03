@@ -6,6 +6,9 @@
 #include <limits>
 
 namespace {
+constexpr int kFuelPurchaseCost = 50;
+constexpr int kFallbackModPurchaseCost = 10;
+
 int read_int() {
     int value;
 
@@ -33,13 +36,44 @@ game::~game() {
     }
 }
 
+bool game::can_player_continue() const {
+    int availableMoney = mPlayer.get_money();
+    bool hasWorkingEquipment = false;
+    int cheapestEquipmentRecovery = kFallbackModPurchaseCost;
+
+    for (const auto& item : mPlayer.get_inventory()) {
+        if (item.mType == "loot") {
+            availableMoney += item.mValue;
+            continue;
+        }
+
+        if (item.mType == "equipment") {
+            if (!item.mIsBroken) {
+                hasWorkingEquipment = true;
+            } else {
+                cheapestEquipmentRecovery = std::min(cheapestEquipmentRecovery, item.mValue / 2);
+            }
+        }
+    }
+
+    int cheapestRaceFee = std::numeric_limits<int>::max();
+    for (const auto* pRace : mRaces) {
+        cheapestRaceFee = std::min(cheapestRaceFee, pRace->get_fee());
+    }
+
+    const int fuelCost = mPlayer.get_fuel() > 0 ? 0 : kFuelPurchaseCost;
+    const int equipmentCost = hasWorkingEquipment ? 0 : cheapestEquipmentRecovery;
+
+    return availableMoney >= fuelCost + equipmentCost + cheapestRaceFee;
+}
+
 void game::run() {
-    while (!mPlayer.is_game_over()) {
+    while (can_player_continue()) {
         show_main_menu();
         handle_main_menu(read_int());
     }
 
-    std::cout << "Game over! You ran out if money and fuel." << std::endl;
+    std::cout << "Game over! You don't have enough resources to keep racing." << std::endl;
 }
 
 void game::show_main_menu() {
