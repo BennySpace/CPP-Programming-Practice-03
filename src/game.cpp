@@ -101,15 +101,9 @@ std::string choose_race_mod() {
 
 game::game() {
     mPlayer.load(mSaveFile);
-    mRaces.push_back(new race_monaco());
-    mRaces.push_back(new race_spa());
-    mRaces.push_back(new race_monza());
-}
-
-game::~game() {
-    for (auto* races : mRaces) {
-        delete races;
-    }
+    mRaces.push_back(std::make_unique<race_monaco>());
+    mRaces.push_back(std::make_unique<race_spa>());
+    mRaces.push_back(std::make_unique<race_monza>());
 }
 
 bool game::can_player_continue() const {
@@ -128,7 +122,7 @@ bool game::can_player_continue() const {
     }
 
     int cheapestRaceFee = std::numeric_limits<int>::max();
-    for (const auto* pRace : mRaces) {
+    for (const auto& pRace : mRaces) {
         cheapestRaceFee = std::min(cheapestRaceFee, pRace->get_fee());
     }
 
@@ -192,7 +186,7 @@ void game::choose_race() {
     int choice = read_int();
 
     if (choice >= 1 && choice <= static_cast<int>(mRaces.size())) {
-        start_race(mRaces[choice - 1]);
+        start_race(mRaces[choice - 1].get());
         mPlayer.save(mSaveFile);
     }
 }

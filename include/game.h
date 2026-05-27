@@ -3,18 +3,18 @@
 
 #include "player.h"
 #include "race.h"
+#include <memory>
 #include <string>
 #include <vector>
 
 class game {
 private:
     player mPlayer;
-    std::vector<race*> mRaces;
+    std::vector<std::unique_ptr<race>> mRaces;
     const std::string mSaveFile = SAVE_FILE_PATH;
 
 public:
     game();
-    ~game();
 
     void run();
 
