@@ -142,9 +142,15 @@ bool player::is_game_over() const {
 
 void player::show_status() const {
     std::cout << "Money: " << mMoney << " | Fuel: " << mFuel << std::endl;
-    std::cout << "Inventory:";
+    std::cout << "Inventory:" << std::endl;
+
+    if (mInventory.empty()) {
+        std::cout << "- Empty" << std::endl;
+        return;
+    }
+
     for (const auto& item : mInventory) {
-        std::cout << item.mName << " (" << item.mType;
+        std::cout << "- " << item.mName << " (" << item.mType;
 
         if (item.mType == "equipment") {
             std::cout << ", durability: " << item.mDurability;
@@ -152,11 +158,9 @@ void player::show_status() const {
             if (item.mIsBroken) {
                 std::cout << ", BROKEN";
             }
-
-            std::cout << "), ";
         }
 
-        std::cout << std::endl;
+        std::cout << ")" << std::endl;
     }
 }
 
@@ -203,7 +207,7 @@ bool player::save(const std::string &pFilename) const {
     file << j.dump(4);
     file.close();
 
-    std::cout << "Game saved successfully.";
+    std::cout << "Game saved successfully." << std::endl;
     return true;
 }
 

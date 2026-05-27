@@ -14,6 +14,11 @@ int read_int() {
     int value;
 
     while (!(std::cin >> value)) {
+        if (std::cin.eof()) {
+            std::cin.clear();
+            return 0;
+        }
+
         std::cout << "Invalid input. Please enter a number: ";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
