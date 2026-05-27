@@ -34,6 +34,18 @@ std::vector<size_t> collect_inventory_indexes_by_type(const std::vector<item>& p
     return indexes;
 }
 
+std::vector<size_t> collect_broken_equipment_indexes(const std::vector<item>& pInventory) {
+    std::vector<size_t> indexes;
+
+    for (size_t i = 0; i < pInventory.size(); ++i) {
+        if (pInventory[i].mType == "equipment" && pInventory[i].mIsBroken) {
+            indexes.push_back(i);
+        }
+    }
+
+    return indexes;
+}
+
 std::string choose_race_mod() {
     while (true) {
         std::cout << "\nChoose car modification for race:" << std::endl;
@@ -278,32 +290,26 @@ void game::visit_shop() {
 
         case 6: {
             const auto& inventory = mPlayer.get_inventory();
-            bool hasBroken = false;
+            const auto brokenEquipmentIndexes = collect_broken_equipment_indexes(inventory);
 
-            for (const auto& item : inventory) {
-                if (item.mType == "equipment" && item.mIsBroken) {
-                    hasBroken = true;
-                    break;
-                }
-            }
-
-            if (!hasBroken) {
+            if (brokenEquipmentIndexes.empty()) {
                 std::cout << "No broken mod to repair." << std::endl;
                 break;
             }
 
-            std::cout << "Broken mod: " << std::endl;
-            for (size_t i = 0; i < inventory.size(); ++i) {
-                if (inventory[i].mType == "equipment" && inventory[i].mIsBroken) {
-                    std::cout << i + 1 << ". " << inventory[i].mName << " (repair cost: " << inventory[i].mValue / 2 << ")" << std::endl;
-                }
+            std::cout << "Broken mods:" << std::endl;
+            for (size_t i = 0; i < brokenEquipmentIndexes.size(); ++i) {
+                const auto& brokenItem = inventory[brokenEquipmentIndexes[i]];
+                std::cout << i + 1 << ". " << brokenItem.mName
+                          << " (repair cost: " << brokenItem.mValue / 2 << ")" << std::endl;
             }
 
             std::cout << "Choose mod to repair (0 to cancel): ";
             int itemChoice = read_int();
 
-            if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
-                mPlayer.repair_equipment(itemChoice - 1, inventory[itemChoice - 1].mValue / 2);
+            if (itemChoice > 0 && itemChoice <= static_cast<int>(brokenEquipmentIndexes.size())) {
+                const size_t inventoryIndex = brokenEquipmentIndexes[itemChoice - 1];
+                mPlayer.repair_equipment(inventoryIndex, inventory[inventoryIndex].mValue / 2);
                 mPlayer.save(mSaveFile);
             }
 
