@@ -21,6 +21,18 @@ int read_int() {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     return value;
 }
+
+std::vector<size_t> collect_inventory_indexes_by_type(const std::vector<item>& pInventory, const std::string& pType) {
+    std::vector<size_t> indexes;
+
+    for (size_t i = 0; i < pInventory.size(); ++i) {
+        if (pInventory[i].mType == pType) {
+            indexes.push_back(i);
+        }
+    }
+
+    return indexes;
+}
 }
 
 game::game() {
@@ -146,8 +158,8 @@ void game::start_race(race* pRace) {
     while (mPlayer.get_fuel() > 0) {
         std::cout << "\nChoose car modification for race:" << std::endl;
         std::cout << "1. Apex-25 AW 'Aero Wing' (advanced wing profiles for better cornering grip)" << std::endl;
-        std::cout << "1. Apex-25 HP 'High Performance' (tuned for maximum power output)" << std::endl;
-        std::cout << "1. Apex-25 WG 'Wet Grip' (specialized tread for wet conditions)" << std::endl;
+        std::cout << "2. Apex-25 HP 'High Performance' (tuned for maximum power output)" << std::endl;
+        std::cout << "3. Apex-25 WG 'Wet Grip' (specialized tread for wet conditions)" << std::endl;
         std::cout << "0. Return to HQ" << std::endl;
         std::cout << "Choice: ";
         int choice = read_int();
@@ -203,24 +215,21 @@ void game::visit_shop() {
         }
 
         case 2: {
-            mPlayer.buy_mod("Aerodynamics", 10);
-            if (mPlayer.get_money() >= 10) {
+            if (mPlayer.buy_mod("Aerodynamics", 10)) {
                 mPlayer.save(mSaveFile);
             }
             break;
         }
 
         case 3: {
-            mPlayer.buy_mod("Engine", 20);
-            if (mPlayer.get_money() >= 20) {
+            if (mPlayer.buy_mod("Engine", 20)) {
                 mPlayer.save(mSaveFile);
             }
             break;
         }
 
         case 4: {
-            mPlayer.buy_mod("Tires", 30);
-            if (mPlayer.get_money() >= 30) {
+            if (mPlayer.buy_mod("Tires", 30)) {
                 mPlayer.save(mSaveFile);
             }
             break;
@@ -228,25 +237,25 @@ void game::visit_shop() {
 
         case 5: {
             const auto& inventory = mPlayer.get_inventory();
+            const auto lootIndexes = collect_inventory_indexes_by_type(inventory, "loot");
 
-            if (inventory.empty()) {
+            if (lootIndexes.empty()) {
                 std::cout << "No items to sell.";
                 break;
             }
 
             std::cout << "Look items: " << std::endl;
-            for (size_t i = 0; i < inventory.size(); ++i) {
-                if (inventory[i].mType == "loot") {
-                    std::cout << i + 1 << ". " << inventory[i].mName
-                              << " (value: " << inventory[i].mValue << ")" << std::endl;
-                }
+            for (size_t i = 0; i < lootIndexes.size(); ++i) {
+                const auto& lootItem = inventory[lootIndexes[i]];
+                std::cout << i + 1 << ". " << lootItem.mName
+                          << " (value: " << lootItem.mValue << ")" << std::endl;
             }
 
             std::cout << "Choose item to sell (0 to cancel): ";
             int itemChoice = read_int();
 
-            if (itemChoice > 0 && itemChoice < inventory.size()) {
-                mPlayer.sell_item(itemChoice - 1);
+            if (itemChoice > 0 && itemChoice <= static_cast<int>(lootIndexes.size())) {
+                mPlayer.sell_item(lootIndexes[itemChoice - 1]);
                 mPlayer.save(mSaveFile);
             }
 
@@ -318,24 +327,25 @@ void game::visit_museum() {
         }
         case 2: {
             const auto& inventory = mPlayer.get_inventory();
-            if (inventory.empty()) {
+            const auto lootIndexes = collect_inventory_indexes_by_type(inventory, "loot");
+
+            if (lootIndexes.empty()) {
                 std::cout << "No items to donate." << std::endl;
                 break;
             }
 
             std::cout << "Loot items available for donation:" << std::endl;
-            for (size_t i = 0; i < inventory.size(); ++i) {
-                if (inventory[i].mType == "loot") {
-                    std::cout << i + 1 << ". " << inventory[i].mName << " (value: " << inventory[i].mValue
-                                       << ")" << std::endl;
-                }
+            for (size_t i = 0; i < lootIndexes.size(); ++i) {
+                const auto& lootItem = inventory[lootIndexes[i]];
+                std::cout << i + 1 << ". " << lootItem.mName << " (value: " << lootItem.mValue
+                                   << ")" << std::endl;
             }
 
             std::cout << "Choose item to donate (0 to cancel): ";
             int itemChoice = read_int();
 
-            if (itemChoice > 0 && itemChoice <= static_cast<int>(inventory.size())) {
-                mPlayer.donate_to_museum(itemChoice - 1);
+            if (itemChoice > 0 && itemChoice <= static_cast<int>(lootIndexes.size())) {
+                mPlayer.donate_to_museum(lootIndexes[itemChoice - 1]);
                 mPlayer.save(mSaveFile);
             }
 
