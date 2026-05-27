@@ -34,6 +34,11 @@ int read_int() {
     return value;
 }
 
+void pause_for_input() {
+    std::cout << "\nPress Enter to continue.";
+    std::cin.get();
+}
+
 std::vector<size_t> collect_inventory_indexes(const std::vector<item>& pInventory,
                                               const std::function<bool(const item&)>& pPredicate) {
     std::vector<size_t> indexes;
@@ -187,7 +192,9 @@ void game::handle_main_menu(int pChoice) {
         case 2: visit_shop(); break;
         case 3: visit_museum(); break;
         case 0: save_progress(); exit(0);
-        default: std::cout << "Invalid choice, try again." << std::endl;
+        default:
+            std::cout << "Invalid choice, try again." << std::endl;
+            pause_for_input();
     }
 }
 
@@ -211,6 +218,9 @@ void game::choose_race() {
 
     if (choice >= 1 && choice <= static_cast<int>(mRaces.size())) {
         start_race(mRaces[choice - 1].get());
+    } else if (choice != 0) {
+        std::cout << "Invalid choice, try again." << std::endl;
+        pause_for_input();
     }
 }
 
@@ -223,16 +233,19 @@ void game::start_race(race* pRace) {
 
     if (!mPlayer.has_mod(equipment)) {
         std::cout << "You don't have a working " << equipment << " mod!" << std::endl;
+        pause_for_input();
         return;
     }
 
     if (mPlayer.get_money() < pRace->get_fee()) {
         std::cout << "Not enough money for the race!" << std::endl;
+        pause_for_input();
         return;
     }
 
     if (mPlayer.get_fuel() <= 0) {
         std::cout << "Not enough fuel for the race! Visit the shop to buy fuel." << std::endl;
+        pause_for_input();
         return;
     }
 
@@ -243,12 +256,14 @@ void game::start_race(race* pRace) {
     if (mPlayer.get_fuel() <= 0) {
         std::cout << "Race conditions drained your fuel before the main lap. Returning to HQ." << std::endl;
         save_progress();
+        pause_for_input();
         return;
     }
 
     pRace->drive(mPlayer, equipment);
     mPlayer.show_status();
     save_progress();
+    pause_for_input();
 }
 
 void game::visit_shop() {
@@ -282,6 +297,7 @@ void game::visit_shop() {
                     std::cout << "Not enough money." << std::endl;
                 }
 
+                pause_for_input();
                 break;
             }
 
@@ -289,6 +305,7 @@ void game::visit_shop() {
                 if (mPlayer.buy_mod("Aerodynamics", 10)) {
                     save_progress();
                 }
+                pause_for_input();
                 break;
             }
 
@@ -296,6 +313,7 @@ void game::visit_shop() {
                 if (mPlayer.buy_mod("Engine", 20)) {
                     save_progress();
                 }
+                pause_for_input();
                 break;
             }
 
@@ -303,6 +321,7 @@ void game::visit_shop() {
                 if (mPlayer.buy_mod("Tires", 30)) {
                     save_progress();
                 }
+                pause_for_input();
                 break;
             }
 
@@ -311,7 +330,8 @@ void game::visit_shop() {
                 const auto lootIndexes = collect_inventory_indexes_by_type(inventory, "loot");
 
                 if (lootIndexes.empty()) {
-                    std::cout << "No items to sell.";
+                    std::cout << "No items to sell." << std::endl;
+                    pause_for_input();
                     break;
                 }
 
@@ -323,6 +343,7 @@ void game::visit_shop() {
                 if (itemChoice >= 0) {
                     mPlayer.sell_item(lootIndexes[itemChoice]);
                     save_progress();
+                    pause_for_input();
                 }
 
                 break;
@@ -334,6 +355,7 @@ void game::visit_shop() {
 
                 if (brokenEquipmentIndexes.empty()) {
                     std::cout << "No broken mod to repair." << std::endl;
+                    pause_for_input();
                     break;
                 }
 
@@ -346,6 +368,7 @@ void game::visit_shop() {
                     const size_t inventoryIndex = brokenEquipmentIndexes[itemChoice];
                     mPlayer.repair_equipment(inventoryIndex, inventory[inventoryIndex].mValue / 2);
                     save_progress();
+                    pause_for_input();
                 }
 
                 break;
@@ -357,6 +380,7 @@ void game::visit_shop() {
 
             default: {
                 std::cout << "Invalid choice." << std::endl;
+                pause_for_input();
             }
         }
     }
@@ -380,6 +404,7 @@ void game::visit_museum() {
         switch (choice) {
             case 1: {
                 mPlayer.show_museum();
+                pause_for_input();
                 break;
             }
             case 2: {
@@ -388,6 +413,7 @@ void game::visit_museum() {
 
                 if (lootIndexes.empty()) {
                     std::cout << "No items to donate." << std::endl;
+                    pause_for_input();
                     break;
                 }
 
@@ -399,6 +425,7 @@ void game::visit_museum() {
                 if (itemChoice >= 0) {
                     mPlayer.donate_to_museum(lootIndexes[itemChoice]);
                     save_progress();
+                    pause_for_input();
                 }
 
                 break;
@@ -407,6 +434,7 @@ void game::visit_museum() {
                 return;
             default:
                 std::cout << "Invalid choice, try again." << std::endl;
+                pause_for_input();
         }
     }
 }
