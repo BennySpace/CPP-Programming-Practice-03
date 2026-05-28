@@ -8,7 +8,7 @@
 #include <limits>
 
 namespace {
-constexpr int kFuelPurchaseCost = 50;
+constexpr int kFuelPurchaseCost = 30;
 constexpr int kFallbackModPurchaseCost = 10;
 
 bool file_exists(const std::string& pFilename) {
@@ -298,7 +298,7 @@ void game::visit_shop() {
 /_/  \__/\_,_/_/_/_/   /___/_//_/\___/ .__/
                                     /_/
     )" << std::endl;
-        std::cout << "1. Buy fuel (50 money for 5 units)" << std::endl;
+        std::cout << "1. Buy fuel (30 money for 5 units)" << std::endl;
         std::cout << "2. Buy Aerodynamics (10 money)" << std::endl;
         std::cout << "3. Buy Engine (20 money)" << std::endl;
         std::cout << "4. Buy Tires (30 money)" << std::endl;
@@ -310,8 +310,8 @@ void game::visit_shop() {
 
         switch (choice) {
             case 1: {
-                if (mPlayer.get_money() >= 50) {
-                    mPlayer.spend_money(50);
+                if (mPlayer.get_money() >= 30) {
+                    mPlayer.spend_money(30);
                     mPlayer.add_fuel(5);
                     std::cout << "Purchased 5 units of fuel." << std::endl;
                     save_progress();

@@ -1,7 +1,7 @@
 #include "race_spa.h"
 #include <iostream>
 
-race_spa::race_spa() : race("Belgian Grand Prix at Spa", "Mixed Weather", 150) {
+race_spa::race_spa() : race("Belgian Grand Prix at Spa", "Mixed Weather", 35) {
     std::random_device randomDevice;
     mRandomNumberGenerator.seed(randomDevice());
 }

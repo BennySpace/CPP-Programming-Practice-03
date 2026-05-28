@@ -1,7 +1,7 @@
 #include "race_monaco.h"
 #include <iostream>
 
-race_monaco::race_monaco() : race("Monaco Grand Prix", "Street Circuit", 100) {
+race_monaco::race_monaco() : race("Monaco Grand Prix", "Street Circuit", 25) {
     std::random_device randomDevice;
     mRandomNumberGenerator.seed(randomDevice());
 }

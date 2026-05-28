@@ -1,7 +1,7 @@
 #include "race_monza.h"
 #include <iostream>
 
-race_monza::race_monza() : race("Italian Grand Prix at Monza", "High-Speed Circuit", 200) {
+race_monza::race_monza() : race("Italian Grand Prix at Monza", "High-Speed Circuit", 45) {
     std::random_device randomDevice;
     mRandomNumberGenerator.seed(randomDevice());
 }
