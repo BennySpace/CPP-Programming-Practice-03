@@ -150,29 +150,7 @@ game::game() {
 }
 
 bool game::can_player_continue() const {
-    int availableMoney = mPlayer.get_money() + mPlayer.get_best_loot_value();
-    bool hasWorkingEquipment = false;
-    int cheapestEquipmentRecovery = kFallbackModPurchaseCost;
-
-    for (const auto& item : mPlayer.get_inventory()) {
-        if (item.mType == "equipment") {
-            if (!item.mIsBroken) {
-                hasWorkingEquipment = true;
-            } else {
-                cheapestEquipmentRecovery = std::min(cheapestEquipmentRecovery, item.mValue / 2);
-            }
-        }
-    }
-
-    int cheapestRaceFee = std::numeric_limits<int>::max();
-    for (const auto& pRace : mRaces) {
-        cheapestRaceFee = std::min(cheapestRaceFee, pRace->get_fee());
-    }
-
-    const int fuelCost = mPlayer.get_fuel() > 0 ? 0 : kFuelPurchaseCost;
-    const int equipmentCost = hasWorkingEquipment ? 0 : cheapestEquipmentRecovery;
-
-    return availableMoney >= fuelCost + equipmentCost + cheapestRaceFee;
+    return !mPlayer.is_game_over();
 }
 
 void game::save_progress() const {
