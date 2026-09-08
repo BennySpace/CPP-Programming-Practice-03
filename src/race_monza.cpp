@@ -32,20 +32,31 @@ void race_monza::drive(player& pPlayer, const std::string& pMod) {
         }
     }
 
-    std::uniform_int_distribution<int> dist(1, 100);
-    int chance = dist(mRandomNumberGenerator);
+    const item lootOptions[] = {
+        item("Trophy Medal", "loot", 80),
+        item("Aero Wing Part", "loot", 200),
+        item("Brake System", "loot", 300)
+    };
+    const char* requiredMods[] = {"Aerodynamics", "Engine", "Tires"};
+    const int lootChances[] = {MONZA_AW_LOOT_CHANCE, MONZA_HP_LOOT_CHANCE, MONZA_WG_LOOT_CHANCE};
+    constexpr size_t kLootOptionCount = sizeof(lootOptions) / sizeof(lootOptions[0]);
 
-    if (pMod == "Aerodynamics" && chance <= MONZA_AW_LOOT_CHANCE) {
-        pPlayer.add_item(item("Trophy Medal", "loot", 80));
-        std::cout << "You won a Trophy Medal!" << std::endl;
-    } else if (pMod == "Engine" && chance <= MONZA_HP_LOOT_CHANCE) {
-        pPlayer.add_item(item("Aero Wing Part", "loot", 200));
-        std::cout << "You found an Aero Wing Part!" << std::endl;
-    } else if (pMod == "Tires" && chance <= MONZA_WG_LOOT_CHANCE) {
-        pPlayer.add_item(item("Brake System", "loot", 300));
-        std::cout << "You found a Brake System!" << std::endl;
+    std::uniform_int_distribution<size_t> lootDist(0, kLootOptionCount - 1);
+    const size_t lootIndex = lootDist(mRandomNumberGenerator);
+    const item& targetLoot = lootOptions[lootIndex];
+
+    if (pMod == requiredMods[lootIndex]) {
+        std::uniform_int_distribution<int> chanceDist(1, 100);
+        if (chanceDist(mRandomNumberGenerator) <= lootChances[lootIndex]) {
+            pPlayer.add_item(targetLoot);
+            std::cout << "You found a " << targetLoot.mName << "!" << std::endl;
+        } else {
+            std::cout << "The " << targetLoot.mName << " slipped away this time." << std::endl;
+        }
+    } else if (pMod == "Aerodynamics") {
+        std::cout << "Aerodynamics was too gentle to recover the " << targetLoot.mName << "." << std::endl;
     } else {
-        std::cout << "No trophies this time. Try different mods!" << std::endl;
+        std::cout << pMod << " mod damaged the " << targetLoot.mName << " before you could recover it!" << std::endl;
     }
 }
 

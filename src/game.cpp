@@ -282,10 +282,34 @@ void game::start_race(race* pRace) {
         return;
     }
 
-    pRace->drive(mPlayer, equipment);
-    mPlayer.show_status();
-    save_progress();
-    pause_for_input();
+    while (true) {
+        pRace->drive(mPlayer, equipment);
+        mPlayer.show_status();
+        save_progress();
+
+        if (mPlayer.get_fuel() <= 0) {
+            std::cout << "You ran out of fuel. Returning to HQ." << std::endl;
+            pause_for_input();
+            return;
+        }
+
+        while (true) {
+            std::cout << "\n1. Continue racing" << std::endl;
+            std::cout << "0. Return to HQ" << std::endl;
+            std::cout << "Choice: ";
+
+            const int choice = read_int();
+            if (choice == 0) {
+                return;
+            }
+
+            if (choice == 1) {
+                break;
+            }
+
+            std::cout << "Invalid choice, try again." << std::endl;
+        }
+    }
 }
 
 void game::visit_shop() {
