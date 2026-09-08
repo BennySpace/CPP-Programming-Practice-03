@@ -145,7 +145,7 @@ void player::sell_item(size_t pIndex) {
 }
 
 bool player::is_game_over() const {
-    return mMoney <= 0 && mFuel <= 0;
+    return mMoney <= 0;
 }
 
 void player::show_status() const {

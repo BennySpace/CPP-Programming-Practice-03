@@ -8,9 +8,6 @@
 #include <limits>
 
 namespace {
-constexpr int kFuelPurchaseCost = 30;
-constexpr int kFallbackModPurchaseCost = 10;
-
 bool file_exists(const std::string& pFilename) {
     std::ifstream file(pFilename);
     return file.good();
