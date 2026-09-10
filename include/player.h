@@ -24,7 +24,6 @@ public:
     void add_item(const item& pItem);
     [[nodiscard]] bool has_mod(const std::string& pMod) const;
     [[nodiscard]] const std::vector<item>& get_inventory() const;
-    [[nodiscard]] int get_best_loot_value() const;
     bool lose_item(size_t pIndex);
     void sell_item(size_t pIndex);
     [[nodiscard]] bool is_game_over() const;
