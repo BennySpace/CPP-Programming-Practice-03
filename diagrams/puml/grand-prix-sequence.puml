@@ -1,0 +1,45 @@
+@startuml
+title Sequence-диаграмма гонки
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+autonumber
+
+actor "Игрок" as user
+participant game
+participant player
+participant "race\n(Monaco / Spa / Monza)" as race
+database "savegame.json" as saveFile
+
+user -> game : Выбрать трассу и модификацию
+game -> player : get_money(), get_fuel(), has_mod(mod)
+
+alt Недостаточно денег
+  game --> user : Отказ: entry fee недоступен
+else Нет топлива
+  game --> user : Отказ: посетить shop
+else Нет исправной модификации
+  game --> user : Отказ: купить или отремонтировать мод
+else Условия выполнены
+  game -> player : spend_money(fee)
+  game -> race : print_text()
+  game -> race : effect(player)
+  race -> player : случайный эффект трассы
+
+  alt Эффект израсходовал топливо
+    game -> player : save()
+    player -> saveFile : Записать JSON
+    game --> user : Вернуться в HQ
+  else Топливо осталось
+    loop Пока выбран «Continue racing» и есть топливо
+      game -> race : drive(player, mod)
+      race -> player : spend_fuel()
+      race -> player : износ мода / лут
+      game -> player : show_status()
+      game -> player : save(silent=true)
+      player -> saveFile : Записать JSON
+    end
+    game --> user : Вернуться в HQ
+  end
+end
+@enduml

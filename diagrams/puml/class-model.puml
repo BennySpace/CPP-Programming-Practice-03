@@ -1,0 +1,81 @@
+@startuml
+title Диаграмма классов
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+class game {
+  - mPlayer : player
+  - mRaces : vector<unique_ptr<race>>
+  - mSaveFile : string
+  + run() : void
+  - choose_race() : void
+  - start_race(race*) : void
+  - visit_shop() : void
+  - visit_museum() : void
+  - save_progress() : void
+}
+
+class player {
+  - mMoney : int
+  - mFuel : int
+  - mInventory : vector<item>
+  - mMuseumCollection : vector<item>
+  - mMuseumRewards : vector<int>
+  + has_mod(name) : bool
+  + buy_mod(name, cost) : bool
+  + repair_equipment(index, cost) : bool
+  + donate_to_museum(index) : void
+  + save(filename) : bool
+  + load(filename) : bool
+}
+
+class item <<struct>> {
+  + mName : string
+  + mType : string
+  + mValue : int
+  + mDescription : string
+  + mDurability : int
+  + mIsBroken : bool
+}
+
+abstract class race {
+  # mName : string
+  # mCircuitType : string
+  # mFee : int
+  # mRandomNumberGenerator : mt19937
+  + drive(player, mod) : void
+  + effect(player) : void
+  + print_text() : void
+  + get_fee() : int
+}
+
+class race_monaco
+class race_spa
+class race_monza
+class "savegame.json" as saveFile <<JSON>>
+
+game *-- "1" player : manages
+game *-- "3" race : creates
+player *-- "0..*" item : inventory
+player *-- "0..*" item : museum collection
+race ..> player : changes resources
+race_monaco --|> race
+race_spa --|> race
+race_monza --|> race
+player ..> saveFile : save() / load()
+
+note right of race
+  Полиморфная точка расширения:
+  каждая трасса задаёт собственные
+  effect() и drive().
+end note
+
+note bottom of item
+  type = equipment или loot.
+  Прочность используется
+  только для equipment.
+end note
+@enduml
